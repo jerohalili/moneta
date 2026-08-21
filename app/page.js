@@ -21,28 +21,26 @@ export default function Dashboard() {
           <h2>Your Tax Snapshot</h2>
         </div>
         <div className="stat-grid">
-          <StatTile label="Gross Income" value="—" tone="accent" />
-          <StatTile label="Estimated Tax Owed" value="—" tone="danger" />
-          <StatTile label="Effective Rate" value="—" tone="info" />
-          <StatTile label="Est. Take-Home" value="—" tone="good" />
+          <StatTile label="Gross Income" value="—" />
+          <StatTile label="Estimated Tax Owed" value="—" />
+          <StatTile label="Effective Rate" value="—" />
+          <StatTile label="Est. Take-Home" value="—" />
         </div>
       </section>
 
-      <div className="dashboard-row">
-        <section className="card">
-          <h2>Income Breakdown</h2>
-          <ChartPlaceholder message="Once your Income Profile is set up, your income and tax breakdown will be charted here." />
-        </section>
+      <section className="card">
+        <h2>Income Breakdown</h2>
+        <ChartPlaceholder message="Once your Income Profile is set up, your income and tax breakdown will be charted here." />
+      </section>
 
-        <section className="card">
-          <h2>Recommendations</h2>
-          <p className="empty-copy">
-            No recommendations yet. Once your Income Profile is set up, the Advisor scans it against BIR rules and
-            surfaces legal ways to lower what you owe here &mdash; each one cited to the specific provision behind
-            it.
-          </p>
-        </section>
-      </div>
+      <section className="card">
+        <h2>Recommendations</h2>
+        <p className="empty-copy">
+          No recommendations yet. Once your Income Profile is set up, the Advisor scans it against BIR rules and
+          surfaces legal ways to lower what you owe here &mdash; each one cited to the specific provision behind
+          it.
+        </p>
+      </section>
     </>
   )
 }
