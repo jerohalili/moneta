@@ -20,7 +20,7 @@ const inter = Inter({
 })
 
 export const metadata = {
-  title: 'Moneta — Philippine tax, computed plainly.',
+  title: 'Moneta',
   description:
     'Free Philippine tax calculators with a rule-based advisor that flags legal ways to lower what you owe.',
 }
@@ -31,7 +31,9 @@ export default function RootLayout({ children }) {
       <body>
         <div className="app-shell">
           <AppNav />
-          <main>{children}</main>
+          <div className="content-area">
+            <main>{children}</main>
+          </div>
         </div>
       </body>
     </html>
