@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getNextDeadline } from '@/lib/deadlines'
 
-export default function FilingCountdown() {
+export default function FilingCountdown({ profileType = 'freelancer' }) {
   // Starts null so server and client agree on the first render (the server
   // doesn't reliably know the visitor's timezone). Right after mount, this
   // reads the real "today" from the browser — a one-time sync with an
@@ -13,8 +13,8 @@ export default function FilingCountdown() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of the browser's local clock, not a render-derivable value
-    setDeadline(getNextDeadline())
-  }, [])
+    setDeadline(getNextDeadline(profileType))
+  }, [profileType])
 
   if (!deadline) {
     return <div className="deadline-card is-loading" aria-hidden="true" />

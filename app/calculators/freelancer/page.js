@@ -14,7 +14,7 @@ export default function FreelancerCalculatorPage() {
           by side.
         </p>
       </div>
-      <FreelancerWorkbench variant="full" />
+      <FreelancerWorkbench />
     </>
   )
 }

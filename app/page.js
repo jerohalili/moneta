@@ -1,4 +1,4 @@
-import FreelancerWorkbench from '@/components/FreelancerWorkbench'
+import IncomeProfile from '@/components/IncomeProfile'
 
 const ROADMAP_TILES = [
   {
@@ -8,7 +8,7 @@ const ROADMAP_TILES = [
   },
   {
     name: 'Payroll Contributions',
-    description: 'SSS, PhilHealth, and Pag-IBIG withholding summaries, for freelancers who employ staff.',
+    description: 'SSS, PhilHealth, and Pag-IBIG withholding summaries, computed automatically instead of self-reported.',
     why: "Needs the 2026 SSS/PhilHealth/Pag-IBIG contribution tables added to data/, which aren't in the codebase yet.",
   },
   {
@@ -24,11 +24,11 @@ export default function Dashboard() {
       <div className="page-heading">
         <h2 className="page-title">Your Tax Snapshot</h2>
         <p className="page-subtitle">
-          Enter your numbers once below — every figure on this page recalculates live from the same inputs.
+          Set up your Income Profile once below — every figure on this page recalculates live from the same inputs.
         </p>
       </div>
 
-      <FreelancerWorkbench variant="dashboard" />
+      <IncomeProfile />
 
       <div className="section-heading">
         <h2>On the roadmap</h2>
