@@ -1,46 +1,50 @@
-import StatTile from '@/components/StatTile'
-import ChartPlaceholder from '@/components/ChartPlaceholder'
+import FreelancerWorkbench from '@/components/FreelancerWorkbench'
+
+const ROADMAP_TILES = [
+  {
+    name: 'Sales Tax Bucket',
+    description: 'A running total of VAT/percentage tax collected, separate from income tax owed.',
+    why: "Needs VAT input/output-credit logic that isn't modeled yet — today's numbers are income-tax-only.",
+  },
+  {
+    name: 'Payroll Contributions',
+    description: 'SSS, PhilHealth, and Pag-IBIG withholding summaries, for freelancers who employ staff.',
+    why: "Needs the 2026 SSS/PhilHealth/Pag-IBIG contribution tables added to data/, which aren't in the codebase yet.",
+  },
+  {
+    name: 'Historical Archive',
+    description: 'Multi-year lookups to compare how your tax position changed year over year.',
+    why: 'Needs an account + database to persist anything between visits — planned, not built.',
+  },
+]
 
 export default function Dashboard() {
   return (
     <>
-      <section className="card profile-card">
-        <div className="profile-card-text">
-          <h2>Your Income Profile</h2>
-          <p className="empty-copy">
-            Set up your profile once and this dashboard fills in automatically &mdash; your tax position, a
-            breakdown chart, and personalized savings flags, all computed from the same numbers every calculator
-            uses.
-          </p>
-        </div>
-        <span className="status-pill soon">Coming soon</span>
-      </section>
-
-      <section>
-        <div className="section-heading">
-          <h2>Your Tax Snapshot</h2>
-        </div>
-        <div className="stat-grid">
-          <StatTile label="Gross Income" value="—" />
-          <StatTile label="Estimated Tax Owed" value="—" />
-          <StatTile label="Effective Rate" value="—" />
-          <StatTile label="Est. Take-Home" value="—" />
-        </div>
-      </section>
-
-      <section className="card">
-        <h2>Income Breakdown</h2>
-        <ChartPlaceholder message="Once your Income Profile is set up, your income and tax breakdown will be charted here." />
-      </section>
-
-      <section className="card">
-        <h2>Recommendations</h2>
-        <p className="empty-copy">
-          No recommendations yet. Once your Income Profile is set up, the Advisor scans it against BIR rules and
-          surfaces legal ways to lower what you owe here &mdash; each one cited to the specific provision behind
-          it.
+      <div className="page-heading">
+        <h2 className="page-title">Your Tax Snapshot</h2>
+        <p className="page-subtitle">
+          Enter your numbers once below — every figure on this page recalculates live from the same inputs.
         </p>
-      </section>
+      </div>
+
+      <FreelancerWorkbench variant="dashboard" />
+
+      <div className="section-heading">
+        <h2>On the roadmap</h2>
+      </div>
+      <div className="calc-grid">
+        {ROADMAP_TILES.map((tile) => (
+          <div className="calc-tile is-soon" key={tile.name}>
+            <div className="calc-tile-top">
+              <h3>{tile.name}</h3>
+              <span className="status-pill soon">Coming soon</span>
+            </div>
+            <p>{tile.description}</p>
+            <p className="roadmap-why">{tile.why}</p>
+          </div>
+        ))}
+      </div>
     </>
   )
 }

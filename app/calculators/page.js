@@ -1,7 +1,10 @@
+import Link from 'next/link'
+
 const CALCULATORS = [
   {
     name: 'Freelancer / Self-Employed Tax',
     description: '8% flat rate vs. graduated rate (OSD or itemized), compared side by side.',
+    href: '/calculators/freelancer',
   },
   { name: 'Employee Income Tax', description: 'Withholding tax on compensation income.' },
   { name: 'Contributions', description: 'SSS, PhilHealth, and Pag-IBIG monthly contributions.' },
@@ -22,20 +25,31 @@ export default function CalculatorsPage() {
       <div className="page-heading">
         <h2 className="page-title">Calculators</h2>
         <p className="page-subtitle">
-          Every calculator reads from your Income Profile &mdash; set your numbers once, and they stay in sync
-          across all of them.
+          Every calculator recalculates live as you type, and compares every legal route side by side &mdash; no
+          &ldquo;Calculate&rdquo; button, no single-answer guesswork.
         </p>
       </div>
       <div className="calc-grid">
-        {CALCULATORS.map((calc) => (
-          <div className="calc-tile is-soon" key={calc.name}>
-            <div className="calc-tile-top">
-              <h3>{calc.name}</h3>
-              <span className="status-pill soon">Coming soon</span>
+        {CALCULATORS.map((calc) => {
+          const tile = (
+            <div className={calc.href ? 'calc-tile' : 'calc-tile is-soon'} key={calc.name}>
+              <div className="calc-tile-top">
+                <h3>{calc.name}</h3>
+                <span className={calc.href ? 'status-pill live' : 'status-pill soon'}>
+                  {calc.href ? 'Live' : 'Coming soon'}
+                </span>
+              </div>
+              <p>{calc.description}</p>
             </div>
-            <p>{calc.description}</p>
-          </div>
-        ))}
+          )
+          return calc.href ? (
+            <Link href={calc.href} className="calc-tile-link" key={calc.name}>
+              {tile}
+            </Link>
+          ) : (
+            tile
+          )
+        })}
       </div>
     </>
   )

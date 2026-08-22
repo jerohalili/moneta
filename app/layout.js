@@ -25,14 +25,15 @@ export const metadata = {
     'Free Philippine tax calculators with a rule-based advisor that flags legal ways to lower what you owe.',
 }
 
-// Runs before paint so the saved theme applies immediately — without this,
-// a dark-mode visitor would see a flash of the light palette on every load.
+// Runs before paint so a *returning* dark-mode visitor doesn't see a flash
+// of the light palette. First-time visitors always start in light mode —
+// deliberately not following the OS's prefers-color-scheme, per product
+// choice — and only switch once they've used the toggle themselves.
 const themeInitScript = `
   (function () {
     try {
       var stored = localStorage.getItem('moneta-theme');
-      var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', theme);
+      document.documentElement.setAttribute('data-theme', stored === 'dark' ? 'dark' : 'light');
     } catch (e) {}
   })();
 `
