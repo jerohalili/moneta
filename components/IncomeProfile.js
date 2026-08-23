@@ -40,7 +40,7 @@ export default function IncomeProfile() {
         <section className="card">
           <h2>Compensation Income</h2>
           <div className="field">
-            <label htmlFor="gross-compensation">Gross compensation this year (₱)</label>
+            <label htmlFor="gross-compensation">Annual gross compensation (₱)</label>
             <input
               id="gross-compensation"
               type="number"
@@ -50,21 +50,42 @@ export default function IncomeProfile() {
               onChange={(e) => p.setGrossCompensationInput(e.target.value)}
             />
           </div>
-          <div className="field">
-            <label htmlFor="contributions">Total SSS + PhilHealth + Pag-IBIG contributions this year (₱)</label>
+
+          {p.grossCompensationInput !== '' && (
+            <div className="stat-tile" style={{ border: 'none', padding: 0, background: 'transparent', marginBottom: 14 }}>
+              <div className="stat-label">Contributions (computed automatically)</div>
+              <div className="stat-value">{formatPHP(p.autoAnnualContributions)}</div>
+            </div>
+          )}
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, marginBottom: p.useContributionsOverride ? 10 : 0 }}>
             <input
-              id="contributions"
-              type="number"
-              inputMode="decimal"
-              placeholder="e.g. 21000"
-              value={p.contributionsInput}
-              onChange={(e) => p.setContributionsInput(e.target.value)}
+              type="checkbox"
+              checked={p.useContributionsOverride}
+              onChange={(e) => p.setUseContributionsOverride(e.target.checked)}
             />
-          </div>
+            My actual contributions are different (irregular pay, multiple employers, etc.)
+          </label>
+
+          {p.useContributionsOverride && (
+            <div className="field">
+              <label htmlFor="contributions-override">Your actual total contributions this year (₱)</label>
+              <input
+                id="contributions-override"
+                type="number"
+                inputMode="decimal"
+                placeholder="e.g. 21000"
+                value={p.contributionsOverride}
+                onChange={(e) => p.setContributionsOverride(e.target.value)}
+              />
+            </div>
+          )}
+
           <p className="disclaimer">
-            Enter your regular taxable compensation only &mdash; exclude 13th-month pay and other de minimis benefits
-            up to ₱90,000, since those are tax-exempt. The official 2026 contribution tables aren&apos;t built into
-            this tool yet, so enter your actual total for now (see the Payroll Contributions roadmap item below).
+            Contributions are computed automatically from your annual compensation (assuming even monthly pay) using
+            current 2026 SSS/PhilHealth/Pag-IBIG rates — see the Contributions calculator for the full breakdown.
+            Enter regular taxable compensation only — exclude 13th-month pay and other de minimis benefits up to
+            ₱90,000, since those are tax-exempt.
           </p>
         </section>
       )}
@@ -182,6 +203,41 @@ export default function IncomeProfile() {
           <TipsList tips={p.tips} />
         </section>
       )}
+
+      {p.profileType !== null && (
+        <section className="card">
+          <h2>Related calculators</h2>
+          <div className="calc-grid">
+            {relatedCalculators(p.profileType).map((calc) => (
+              <Link href={calc.href} className="calc-tile-link" key={calc.href}>
+                <div className="calc-tile">
+                  <div className="calc-tile-top">
+                    <h3>{calc.name}</h3>
+                  </div>
+                  <p>{calc.description}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </>
   )
+}
+
+function relatedCalculators(profileType) {
+  const EMPLOYEE = [
+    { name: 'Employee Income Tax', description: 'A dedicated deep-dive on your withholding tax.', href: '/calculators/employee' },
+    { name: 'Net Pay', description: 'See your full monthly take-home breakdown.', href: '/calculators/net-pay' },
+    { name: '13th Month Pay', description: 'Compute your 13th-month pay and its tax-exempt portion.', href: '/calculators/thirteenth-month' },
+    { name: 'Contributions', description: 'The full SSS/PhilHealth/Pag-IBIG breakdown.', href: '/calculators/contributions' },
+  ]
+  const BUSINESS = [
+    { name: 'Freelancer / Self-Employed Tax', description: 'Compare every route (8% vs. graduated) side by side.', href: '/calculators/freelancer' },
+    { name: 'Business Taxes', description: 'Percentage tax for non-VAT-registered businesses.', href: '/calculators/business' },
+    { name: 'Property & Transfer Taxes', description: 'Selling property or receiving a gift? Compute that here.', href: '/calculators/property' },
+  ]
+  if (profileType === 'employee') return EMPLOYEE
+  if (profileType === 'mixed') return [...EMPLOYEE.slice(0, 2), ...BUSINESS.slice(0, 1)]
+  return BUSINESS
 }

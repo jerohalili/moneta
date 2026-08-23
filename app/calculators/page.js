@@ -6,13 +6,41 @@ const CALCULATORS = [
     description: '8% flat rate vs. graduated rate (OSD or itemized), compared side by side.',
     href: '/calculators/freelancer',
   },
-  { name: 'Employee Income Tax', description: 'Withholding tax on compensation income.' },
-  { name: 'Contributions', description: 'SSS, PhilHealth, and Pag-IBIG monthly contributions.' },
-  { name: 'Net Pay', description: 'Take-home pay after contributions and withholding tax.' },
-  { name: '13th Month Pay', description: 'Statutory computation and tax-exempt threshold.' },
-  { name: 'Business Taxes', description: 'Percentage tax, VAT, and quarterly filings for registered businesses.' },
-  { name: 'Property & Transfer Taxes', description: 'Capital gains, documentary stamp, and estate/donor\u2019s tax.' },
-  { name: 'BIR Penalties', description: 'Surcharge, interest, and compromise penalty estimates for late filing.' },
+  {
+    name: 'Employee Income Tax',
+    description: 'Withholding tax on compensation income.',
+    href: '/calculators/employee',
+  },
+  {
+    name: 'Contributions',
+    description: 'SSS, PhilHealth, and Pag-IBIG monthly contributions.',
+    href: '/calculators/contributions',
+  },
+  {
+    name: 'Net Pay',
+    description: 'Take-home pay after contributions and withholding tax.',
+    href: '/calculators/net-pay',
+  },
+  {
+    name: '13th Month Pay',
+    description: 'Statutory computation and tax-exempt threshold.',
+    href: '/calculators/thirteenth-month',
+  },
+  {
+    name: 'Business Taxes',
+    description: 'Percentage tax for non-VAT-registered businesses.',
+    href: '/calculators/business',
+  },
+  {
+    name: 'Property & Transfer Taxes',
+    description: 'Capital gains, documentary stamp, and estate/donor\u2019s tax.',
+    href: '/calculators/property',
+  },
+  {
+    name: 'BIR Penalties',
+    description: 'Surcharge, interest, and compromise penalty estimates for late filing.',
+    href: '/calculators/penalties',
+  },
 ]
 
 export const metadata = {

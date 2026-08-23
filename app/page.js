@@ -3,13 +3,8 @@ import IncomeProfile from '@/components/IncomeProfile'
 const ROADMAP_TILES = [
   {
     name: 'Sales Tax Bucket',
-    description: 'A running total of VAT/percentage tax collected, separate from income tax owed.',
-    why: "Needs VAT input/output-credit logic that isn't modeled yet — today's numbers are income-tax-only.",
-  },
-  {
-    name: 'Payroll Contributions',
-    description: 'SSS, PhilHealth, and Pag-IBIG withholding summaries, computed automatically instead of self-reported.',
-    why: "Needs the 2026 SSS/PhilHealth/Pag-IBIG contribution tables added to data/, which aren't in the codebase yet.",
+    description: 'A running total of VAT collected/paid, separate from income tax owed.',
+    why: "Needs VAT input/output-credit logic that isn't modeled yet. Percentage tax for non-VAT businesses is live in the Business Taxes calculator.",
   },
   {
     name: 'Historical Archive',

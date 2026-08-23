@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { compareRoutes } from '@/lib/freelancerTax'
 import { computeEmployeeTax } from '@/lib/employeeTax'
+import { computeMonthlyContributions } from '@/lib/contributions'
 import { getFreelancerTips } from '@/lib/advisor'
 import { EXPENSE_CATEGORIES } from '@/lib/expenseCategories'
 
@@ -23,6 +24,12 @@ export const PROFILE_TYPES = [
  * professional income identically under NIRC Sec. 24(A)/24(A)(2)(b); the
  * label is different, the math isn't.
  *
+ * Mandatory contributions (SSS/PhilHealth/Pag-IBIG) for Employee/Mixed
+ * profiles are computed automatically from annual gross compensation via
+ * lib/contributions.js — no manual self-reporting required. This assumes
+ * even monthly pay across the year; someone with irregular pay can still
+ * override the computed figure (see `contributionsOverride`).
+ *
  * Mixed applies the RR 8-2018 rule that a mixed-income earner's 8% election
  * does NOT get the ₱250,000 exemption on the business side (see
  * lib/freelancerTax.js) since that exemption is already used up by their
@@ -32,7 +39,8 @@ export function useIncomeProfile() {
   const [profileType, setProfileType] = useState(null)
 
   const [grossCompensationInput, setGrossCompensationInput] = useState('')
-  const [contributionsInput, setContributionsInput] = useState('')
+  const [contributionsOverride, setContributionsOverride] = useState('')
+  const [useContributionsOverride, setUseContributionsOverride] = useState(false)
   const [grossReceiptsInput, setGrossReceiptsInput] = useState('')
   const [ledger, setLedger] = useState([])
   const [draft, setDraft] = useState({
@@ -47,8 +55,20 @@ export function useIncomeProfile() {
   const isMixed = profileType === 'mixed'
 
   const grossCompensation = Math.max(0, Number(grossCompensationInput) || 0)
-  const mandatoryContributions = Math.max(0, Number(contributionsInput) || 0)
   const grossReceipts = Math.max(0, Number(grossReceiptsInput) || 0)
+
+  const autoContributions = useMemo(
+    () =>
+      needsEmployeeFields && grossCompensation > 0
+        ? computeMonthlyContributions({ monthlyCompensation: grossCompensation / 12 })
+        : null,
+    [needsEmployeeFields, grossCompensation]
+  )
+  const autoAnnualContributions = autoContributions ? autoContributions.totalEmployee * 12 : 0
+  const mandatoryContributions =
+    useContributionsOverride && contributionsOverride !== ''
+      ? Math.max(0, Number(contributionsOverride) || 0)
+      : autoAnnualContributions
 
   const itemizedExpenses = useMemo(
     () => ledger.reduce((sum, entry) => sum + entry.amount, 0),
@@ -87,14 +107,14 @@ export function useIncomeProfile() {
 
   const errors = useMemo(() => {
     const list = []
-    if (needsEmployeeFields && contributionsInput !== '' && mandatoryContributions > grossCompensation) {
+    if (useContributionsOverride && contributionsOverride !== '' && Number(contributionsOverride) > grossCompensation) {
       list.push('Your contributions exceed your gross compensation — double-check the numbers.')
     }
     if (needsBusinessFields && hasBusinessIncome && itemizedExpenses > grossReceipts) {
       list.push('Your logged expenses add up to more than your gross receipts/sales — double-check the ledger below.')
     }
     return list
-  }, [needsEmployeeFields, needsBusinessFields, contributionsInput, mandatoryContributions, grossCompensation, hasBusinessIncome, itemizedExpenses, grossReceipts])
+  }, [useContributionsOverride, contributionsOverride, grossCompensation, needsBusinessFields, hasBusinessIncome, itemizedExpenses, grossReceipts])
 
   // Deliberately defined the same way across all four profile types, so
   // the four headline stat tiles mean the same thing no matter which
@@ -131,8 +151,13 @@ export function useIncomeProfile() {
     setProfileType,
     grossCompensationInput,
     setGrossCompensationInput,
-    contributionsInput,
-    setContributionsInput,
+    contributionsOverride,
+    setContributionsOverride,
+    useContributionsOverride,
+    setUseContributionsOverride,
+    autoContributions,
+    autoAnnualContributions,
+    mandatoryContributions,
     grossReceiptsInput,
     setGrossReceiptsInput,
     ledger,
@@ -144,7 +169,9 @@ export function useIncomeProfile() {
     needsBusinessFields,
     isMixed,
     hasAnyIncome,
+    hasEmployeeIncome,
     hasBusinessIncome,
+    employeeResult,
     businessComparison,
     tips,
     categoryTotals,
