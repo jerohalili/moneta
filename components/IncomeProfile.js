@@ -185,15 +185,10 @@ export default function IncomeProfile() {
             {(p.profileType === 'freelancer' || p.profileType === 'business') && (
               <Link href="/calculators/freelancer">Compare all routes side by side →</Link>
             )}
+            {p.isMixed && (
+              <Link href="/calculators/mixed-income">See the full Mixed Income calculator →</Link>
+            )}
           </p>
-          {p.isMixed && (
-            <p className="disclaimer" style={{ marginTop: 8 }}>
-              This applies the mixed-income-earner rule (RR 8-2018): the ₱250,000 exemption on the 8% option isn&apos;t
-              available to you, since it&apos;s already used on your compensation side. The full calculator at
-              /calculators/freelancer doesn&apos;t model this yet, so its numbers would look more favorable than yours
-              actually are &mdash; use the figures on this page instead.
-            </p>
-          )}
         </section>
       )}
 
@@ -238,6 +233,10 @@ function relatedCalculators(profileType) {
     { name: 'Property & Transfer Taxes', description: 'Selling property or receiving a gift? Compute that here.', href: '/calculators/property' },
   ]
   if (profileType === 'employee') return EMPLOYEE
-  if (profileType === 'mixed') return [...EMPLOYEE.slice(0, 2), ...BUSINESS.slice(0, 1)]
+  if (profileType === 'mixed') return [
+    { name: 'Mixed Income Tax', description: 'The full combined calculator, with the RR 8-2018 rule already applied.', href: '/calculators/mixed-income' },
+    ...EMPLOYEE.slice(1, 2),
+    ...BUSINESS.slice(1),
+  ]
   return BUSINESS
 }

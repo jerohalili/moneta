@@ -109,3 +109,52 @@ export const COMPROMISE_PENALTY_BRACKETS = [
   { upTo: 1_000_000, amount: 20_000 },
   { upTo: Infinity, amount: 25_000 },
 ]
+
+// --- Corporate income tax (CREATE Act, RA 11534) ---
+export const CORPORATE_TAX_RATE_STANDARD = 0.25
+export const CORPORATE_TAX_RATE_SMALL = 0.20 // net taxable income ≤5M AND total assets ≤100M (excl. land)
+export const CORPORATE_SMALL_INCOME_CEILING = 5_000_000
+export const CORPORATE_SMALL_ASSET_CEILING = 100_000_000
+export const MCIT_RATE = 0.02 // of gross income, from the 4th taxable year of operations onward
+
+// --- BMBE (Barangay Micro Business Enterprise, RA 9178) ---
+export const BMBE_ASSET_CEILING = 3_000_000 // excluding land
+
+// --- VAT & Percentage Tax context ---
+// (VAT_RATE, VAT_THRESHOLD, PERCENTAGE_TAX_RATE already defined above)
+
+// --- Expanded Withholding Tax (EWT), RR 2-98 as amended by RR 11-2018 ---
+export const EWT_PROFESSIONAL_INDIVIDUAL_LOW = 0.05 // payee's annual gross income ≤ ₱3M, with sworn declaration
+export const EWT_PROFESSIONAL_INDIVIDUAL_HIGH = 0.10
+export const EWT_PROFESSIONAL_INDIVIDUAL_THRESHOLD = 3_000_000
+export const EWT_PROFESSIONAL_CORPORATE_LOW = 0.10 // payee's annual gross income ≤ ₱720k
+export const EWT_PROFESSIONAL_CORPORATE_HIGH = 0.15
+export const EWT_PROFESSIONAL_CORPORATE_THRESHOLD = 720_000
+export const EWT_RENTAL_RATE = 0.05
+export const EWT_CONTRACTOR_RATE = 0.02
+export const EWT_GOVT_GOODS_RATE = 0.01 // government money payments, goods
+export const EWT_GOVT_SERVICES_RATE = 0.02 // government money payments, services
+export const EWT_TOP_AGENT_GOODS_RATE = 0.01
+export const EWT_TOP_AGENT_SERVICES_RATE = 0.02
+
+// --- Real Property Tax (Local Government Code, RA 7160) ---
+// Statutory ceilings — an LGU ordinance may (and often does) set a lower
+// actual rate, so these are upper bounds, not universal figures.
+export const RPT_RATE_PROVINCE = 0.01
+export const RPT_RATE_CITY_METRO_MANILA = 0.02
+export const RPT_SEF_RATE = 0.01 // Special Education Fund, added on top, all LGUs
+
+// --- Documentary stamp tax, other instrument types (NIRC Title VII) ---
+export const DST_LOAN_RATE_PER_200 = 1.50 // per ₱200 (or fraction) of the loan/debt instrument's face value
+export const DST_LEASE_RATE_FIRST_2000 = 6 // flat, first ₱2,000 of the lease term's total contract price
+export const DST_LEASE_RATE_PER_1000_EXCESS = 2 // per ₱1,000 (or fraction) thereafter
+
+// --- Overtime & premium pay (Labor Code, as amended; DOLE) ---
+export const OT_REGULAR_MULTIPLIER = 1.25 // ordinary OT, on top of the hourly rate
+export const OT_REST_DAY_MULTIPLIER = 1.30
+export const OT_REST_DAY_OT_MULTIPLIER = 1.30 * 1.30
+export const OT_SPECIAL_HOLIDAY_MULTIPLIER = 1.30
+export const OT_SPECIAL_HOLIDAY_OT_MULTIPLIER = 1.30 * 1.30
+export const OT_REGULAR_HOLIDAY_MULTIPLIER = 2.00
+export const OT_REGULAR_HOLIDAY_OT_MULTIPLIER = 2.00 * 1.30
+export const NIGHT_DIFFERENTIAL_MULTIPLIER = 0.10 // additional, for hours worked 10PM–6AM

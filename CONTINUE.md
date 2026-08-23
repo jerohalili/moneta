@@ -1,79 +1,77 @@
 # Continuing Moneta — handoff notes
 
-Read this first if you're picking this project up in a new chat, a new LLM, or after a long gap. It's written so a model with zero prior context on this repo can get productive in one read.
+Read this first if you're picking this project up in a new chat, a new LLM, or after a long gap.
 
 ## What this project is
 
-Moneta is a free web tool that computes Philippine (BIR) taxes and flags **legal** ways to lower what someone owes — every tip cited to a specific tax rule, not a guess. Repo: `jerohalili/moneta`. Target user: an individual Filipino freelancer, employee, or small business owner. This is an individual-taxpayer tool, not a practice-management tool for accountants/bookkeepers — no admin panel, no multi-client features, by design.
-
-Currency is always PHP (₱).
+Moneta is a free web tool that computes Philippine (BIR) taxes and flags **legal** ways to lower what someone owes — every tip cited to a specific tax rule. Repo: `jerohalili/moneta`. Individual-taxpayer-first tool: no admin panel, no multi-client/practice-management features. Currency is always PHP.
 
 ## Stack
 
 - **Next.js 16** (App Router), **React 19**
-- Plain CSS (`app/globals.css`) using CSS custom properties — no Tailwind, no CSS-in-JS
-- **Neon (Postgres)** and **Auth.js** are planned but *not wired up yet* — everything is computed **client-side, in React state, for the current browser tab only**. Refresh and it resets. Intentional, known gap — don't fake persistence
+- Plain CSS (`app/globals.css`), CSS custom properties, no Tailwind
+- **Neon (Postgres)** and **Auth.js** are planned but *not wired up yet* — everything is client-side React state, per browser tab, reset on refresh. Known, intentional gap.
 - Deployed on **Vercel**
 
-## This session: full calculator suite, all 8 now live
+## This session: second wave of calculators — 22 live calculators total
 
-Previously only the Freelancer calculator was real; the rest were "Coming soon" tiles. All 8 are now built and linked from `/calculators`:
+The person pasted a full competitor-style catalog (grouped as Personal Income / Payroll & Benefits / Business / Property & Transfer / Penalties & Compliance / BIR Tools / RDO Tools) and asked to "add what can be added, ignore what should not be added." Here's exactly what was added, what was deliberately skipped, and why — read this before assuming a gap is unintentional.
 
-| Calculator | Route | Core logic |
+### Added this session
+
+| Calculator | Route | Notes |
 |---|---|---|
-| Freelancer / Self-Employed Tax | `/calculators/freelancer` | `lib/freelancerTax.js` (pre-existing) |
-| Employee Income Tax | `/calculators/employee` | `lib/employeeTax.js` (pre-existing) |
-| Contributions | `/calculators/contributions` | `lib/contributions.js` (new) |
-| Net Pay | `/calculators/net-pay` | `lib/netPay.js` (new, composes contributions + employee tax) |
-| 13th Month Pay | `/calculators/thirteenth-month` | `lib/thirteenthMonthPay.js` (new) |
-| Business Taxes | `/calculators/business` | `lib/percentageTax.js` (new) |
-| Property & Transfer Taxes | `/calculators/property` | `lib/propertyTax.js` (new — CGT, DST, estate tax, donor's tax, one page with a mode switcher) |
-| BIR Penalties | `/calculators/penalties` | `lib/penalties.js` (new — surcharge, interest, compromise) |
+| Mixed Income Tax | `/calculators/mixed-income` | **High priority** — this is the calculator that resolves the "known inconsistency" flagged in earlier sessions. `lib/mixedIncomeTax.js` combines `computeEmployeeTax` + `compareRoutes({ isMixedIncomeEarner: true })`. The Dashboard's Mixed profile now links here directly instead of showing a disclaimer. |
+| Variable Income | `/calculators/variable-income` | Mid-year salary changes / partial-year work. `lib/variableIncome.js` — build a list of {months, monthlySalary} periods, computes contributions per-period (not blended), sums to annual tax + 13th month. |
+| Corporate Income Tax | `/calculators/corporate` | `lib/corporateTax.js` — CREATE Act (RA 11534): 25%/20% RCIT, 2% MCIT from year 4, pays the higher of the two. Doesn't model PEZA/BOI incentive regimes (ITH, 5% SCIT, Enhanced Deductions) — explicitly out of scope, stated in the UI. |
+| VAT & Percentage Tax | `/calculators/business` (expanded) | `lib/percentageTax.js` gained `computeVat()` — simple output-minus-input VAT. Explicitly simplified: doesn't handle zero-rated/exempt sales mixes, input VAT apportionment, or carryover from prior periods — stated in the UI. Percentage tax mode unchanged from before. |
+| BMBE Tax Savings | `/calculators/bmbe` | `lib/bmbe.js` — RA 9178, ₱3M asset ceiling (excluding land), 100% income tax exemption if eligible. Reuses `compareRoutes()` to show what they'd otherwise owe. |
+| Sole Prop vs Corporation | `/calculators/sole-prop-vs-corp` | Pure UI composition of the freelancer and corporate calculators — no new lib file. Explicitly flags that it's income-tax-only and doesn't capture SEC filing costs, mandatory audits, or the dividend tax layer on distributed corporate profits. |
+| Expanded Withholding Tax (EWT) | `/calculators/ewt` | `lib/ewt.js` — professional fees (5%/10% individual, 10%/15% corporate, threshold-dependent), rentals (5%), contractors (2%), gov't money payments (1% goods / 2% services). Covers ~6 common categories, not the full ~40-item ATC table — stated in the UI. |
+| Overtime Pay | `/calculators/overtime` | `lib/overtimePay.js` — Labor Code multipliers (regular OT 125%, rest day 130%, regular holiday 200%, compounded combinations, +10% night differential). This is DOLE labor law, not BIR — included anyway since it's core to a "Payroll & Benefits" grouping and the multipliers are stable, not annually revised. |
+| BIR Closure Penalty Estimator | `/calculators/closure-penalty` | `lib/closurePenalty.js` — reuses the compromise-penalty floor from `lib/penalties.js`, multiplied by count of unfiled returns. |
+| BIR Filing Calendar | `/calculators/filing-calendar` | New `lib/deadlines.js` export: `RECURRING_BUSINESS_DEADLINES` (VAT/EWT/payroll withholding monthly+annual forms), alongside the existing `SELF_EMPLOYED_DEADLINES`/`EMPLOYEE_DEADLINES`. Full-year list view, not just "next deadline." |
+| BIR Form Finder | `/calculators/form-finder` | Rule-based quiz, no new `lib/` file — conditional logic lives directly in the component since it's pure routing logic over profile type + a few yes/no flags. |
+| Real Property Tax | `/calculators/property` (new mode) | `lib/realPropertyTax.js` — statutory ceiling rates only (1% province / 2% city + 1% SEF, RA 7160). Explicitly stated as a ceiling, not a bill — actual LGU rate may be lower. Takes assessed value directly; doesn't compute it from FMV since assessment-level tables are property-type-specific and not modeled. |
+| DST — Loans & Leases | `/calculators/property` (new mode) | Added to `lib/propertyTax.js`'s neighborhood via two inline formulas in the component (loan: ₱1.50/₱200 face value; lease: ₱6 flat + ₱2/₱1,000 excess). Covers 2 of ~20 DST instrument types under NIRC Title VII — stated in the UI. |
+| ONETT deadline | `/calculators/property` (Sale mode addition) | Given a notarization date, computes CGT due (+30 days) and DST due (5th of following month). **Deliberately does not auto-adjust for weekends/holidays** — see "Deliberately skipped" below. |
 
-All new rate constants live in `data/taxRates2026.js` alongside the existing ones, with citations to the specific NIRC section or law in the comments (RA 11199 for SSS, RA 11223 for PhilHealth, RA 11976/EOPT Act for the reduced penalty rates, etc.).
+All new rate constants are in `data/taxRates2026.js`, each cited to its NIRC section, RA number, or RR. **Rates were verified via web search this session**, not pulled from memory — CREATE Act corporate rates, BMBE Law figures, EWT rates (RR 11-2018), and Local Government Code RPT ceilings all confirmed against multiple current sources before being hardcoded.
 
-**Rates were verified via web search this session** (SSS/PhilHealth/Pag-IBIG schedules, CGT/DST/estate/donor's tax rates, BIR surcharge/interest/EOPT rates, RMO 7-2015 compromise brackets) rather than pulled from memory, since these are exactly the kind of figures that drift with circulars. Two honesty notes worth knowing if you touch this code:
+**All new `lib/*.js` functions were functionally smoke-tested**, not just linted — ran each with realistic inputs via a Node loader script resolving the `@/` alias, and hand-verified the arithmetic (e.g. confirmed the mixed-income 8% election genuinely produces a higher, correct tax than a pure self-employed person would pay on the same receipts, since the ₱250,000 exemption doesn't apply to them).
 
-- **The compromise penalty table in `lib/penalties.js`/`data/taxRates2026.js` is a representative estimate, not an exact quote.** Source tables for RMO 7-2015 disagree across different secondary sources depending on violation type. The UI says this explicitly ("confirm your exact bracket at your RDO") — don't remove that caveat without re-sourcing the table from BIR's actual RMO text.
-- **SSS Monthly Salary Credit (MSC) is estimated by rounding to the nearest ₱500**, not looked up from the official bracket table (which isn't machine-readable anywhere I could find). This is accurate almost everywhere but can be off by one bracket right at a boundary — also called out in the UI.
-- **All new logic was functionally smoke-tested by hand** (ran each function with realistic inputs, verified the arithmetic manually) before considering it done — not just linted. See the numbers checked out: e.g. ₱600,000 gross − ₱25,000 contributions → ₱57,500 tax, which matches the TRAIN bracket formula (₱22,500 + 20% of the excess over ₱400,000) exactly.
+### Deliberately skipped, with reasons — don't build these without addressing the reason first
 
-### Business Taxes scope note
-Only percentage tax (3%, non-VAT-registered, NIRC Sec. 116) is modeled. VAT input/output-credit computation for VAT-registered businesses is explicitly flagged as not built (same gap noted on the Dashboard roadmap).
+- **RDO Map** (interactive map of 124 BIR Revenue District Offices) — skipped. Building this honestly requires a verified, complete 124-entry dataset (RDO code, jurisdiction, address) that I couldn't confidently source and cross-check in this session. Getting even a few entries wrong has real consequences — it could send someone to the wrong RDO for an actual filing. If you build this, source it from BIR's own published RDO list directly, not secondary blog aggregations, and verify every entry.
+- **Holiday-adjusted deadlines** (the "adjusts for holidays and weekends" part of ONETT, and implicitly every other deadline calculator) — skipped. The Philippine holiday calendar changes every year by presidential proclamation; hardcoding a fixed list would silently go stale. Every deadline calculator in this codebase computes the *base statutory date* and says explicitly, in the UI, that it doesn't auto-adjust for weekends/holidays. If you want real adjustment, it needs either a live holiday-calendar API or an annually-updated data file with a clear "as of" date.
+- **Standalone "Income Tax Calculator" (generic employee+self-employed)** — skipped as redundant. The Employee and Freelancer calculators already cover this more clearly split apart than one combined router-style tool would.
+- **Standalone "8% vs Graduated Rate"** — skipped as redundant. This comparison is already the core feature of the Freelancer calculator (`compareRoutes()`).
+- **Standalone "Percentage Tax (OPT)"** — skipped as redundant with the Percentage Tax mode already in VAT & Percentage Tax.
+- **"Ad" slots** from the pasted catalog — not calculators, not built. Anthropic's products don't insert ads, and there was no reason to scaffold placeholder ad components into someone else's app.
 
-## Income Profile — improved this session
+### Income Profile / Dashboard changes this session
 
-`hooks/useIncomeProfile.js` and `components/IncomeProfile.js`: mandatory contributions for Employee/Mixed profiles are now **computed automatically** from annual gross compensation via `lib/contributions.js`, instead of requiring the person to self-report a number they'd probably have to look up anyway. There's still a manual override checkbox ("My actual contributions are different") for people with irregular pay or multiple employers, but auto-compute is the default path now.
+`components/IncomeProfile.js`: the Mixed profile's "Cheapest legal route" section now links to the real `/calculators/mixed-income` page instead of showing a disclaimer explaining why it couldn't link anywhere. The "Related calculators" section's Mixed branch was updated to lead with the new Mixed Income calculator.
 
-This also means the "Payroll Contributions" roadmap tile is gone from the Dashboard — it's built now, not a placeholder.
+## Known gaps still open (mostly pre-existing, still true)
 
-## Dashboard — improved this session
-
-`components/IncomeProfile.js` now ends with a **"Related calculators" section** that deep-links to the right full calculators based on the selected profile type (e.g. an Employee profile links to Employee Income Tax, Net Pay, 13th Month Pay, and Contributions; a Freelancer/Business profile links to the Freelancer calculator, Business Taxes, and Property & Transfer Taxes). This is what actually connects the Dashboard to the calculator suite — previously they were two disconnected parts of the app.
-
-The roadmap grid now only has two tiles left: **Sales Tax Bucket** (needs VAT credit modeling) and **Historical Archive** (needs the database layer). Everything else that was on the original wishlist is built.
-
-## Known inconsistency, still flagged in the UI (carried over from a previous session)
-
-For **Mixed** profiles, the Dashboard correctly applies the RR 8-2018 rule that a mixed-income earner's 8% election doesn't get the ₱250,000 exemption. The full Freelancer calculator at `/calculators/freelancer` still always assumes pure self-employment, so it would show a more favorable — and wrong — number for a Mixed profile. The Dashboard's "Cheapest legal route" card only links out to that calculator for Freelancer/Business profiles, and shows an explicit disclaimer instead for Mixed. Fix properly by building a real Mixed-income calculator page (see next steps).
-
-## Design system (unchanged this session, for reference)
-
-Charcoal-first dark mode (`--paper: #17191B`, not green-black), green reserved for accents (`--accent: #34D399` in dark, `#14804A` in light), glassmorphism (`rgba(var(--glass-rgb), a)` + `backdrop-filter: blur()`), default theme always light for first-time visitors, full-width layout via `.container` (`max-width: 1360px`). All of this lives in `app/globals.css`.
+- No auth/persistence (Milestone 1 in the earlier scope conversation, still not started)
+- Sales Tax Bucket roadmap tile (full VAT with zero-rated/exempt mixing) — the new VAT mode covers the simple case only
+- Historical Archive — needs the database layer
 
 ## Verified working
 
-- `npm install && npx eslint .` — clean, zero errors
-- **All new `lib/*.js` functions were run directly in Node** (via a loader script resolving the `@/` path alias) with realistic inputs and the output was checked by hand against the known tax formulas — not just linted
+- `npm install && npx eslint .` — clean, zero errors, full project
+- All new `lib/*.js` logic hand-verified via direct Node execution (not just linted) — see smoke-test numbers above
 - `npm run build` still can't be verified in a network-locked sandbox (`next/font/google` needs `fonts.googleapis.com`) — environment limitation, not a code issue
 
 ## Suggested next steps
 
-1. Build a real **Mixed-income calculator page** so the Dashboard's Mixed profile can link out with confidence instead of showing a disclaimer suppressing the link
-2. VAT input/output-credit modeling for VAT-registered businesses (the Sales Tax Bucket roadmap item)
-3. Auth + persistence (Neon + Auth.js) — the big architectural lift that unlocks Historical Archive and makes the Income Profile a true cross-session single source of truth instead of resetting on refresh
-4. Re-verify all rate constants in `data/taxRates2026.js` against official sources if you're reading this in a new tax year — especially the SSS/PhilHealth/Pag-IBIG schedules and the compromise penalty brackets, both flagged above as estimates
+1. Wire up Auth + Neon persistence — the single biggest lever left, unlocks Historical Archive and makes Income Profile durable across sessions
+2. If RDO Map or holiday-adjusted deadlines come up again, source the underlying data properly first (see "Deliberately skipped" above) rather than hardcoding something unverified
+3. Full VAT modeling (zero-rated/exempt mix, input VAT apportionment, carryover tracking) if the simplified version in `/calculators/business` proves insufficient for real users
+4. Re-verify every rate constant in `data/taxRates2026.js` against official sources if reading this in a new tax year — this file is large now; the comments above each constant cite the legal basis to make re-verification tractable section by section
 
 ## How to hand this to a different LLM
 
-Paste this file's contents (or point at `CONTINUE.md` in the repo root) plus: "continue this project." It explains what's real, what's an honest estimate vs. an exact figure, the Dashboard/calculator connection, the mixed-income rule inconsistency to watch for, and what to build next.
+Paste this file's contents (or point at `CONTINUE.md`) plus: "continue this project." It explains what's built, what was deliberately left out and why (important — don't re-attempt the skipped items without addressing the stated reason), and what's next.
