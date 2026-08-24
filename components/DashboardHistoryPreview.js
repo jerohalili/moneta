@@ -46,7 +46,8 @@ export default function DashboardHistoryPreview() {
         ))}
       </ul>
       <p className="disclaimer" style={{ marginTop: 16 }}>
-        Saved to your account when you&apos;re signed in (synced across devices); browser-only otherwise.
+        Saved automatically to your account — expand an entry on the History page to see every figure from
+        that day.
       </p>
     </section>
   )

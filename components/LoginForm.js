@@ -6,12 +6,11 @@ import { authClient, authErrorMessage } from '@/lib/auth-client'
 import { SYNC_EVENTS } from '@/lib/cloudSync'
 
 /**
- * Three ways in:
- *  - Continue with Google (button shows an honest error if the deployment
- *    hasn't configured Google credentials)
- *  - Email + password (sign in / create account toggle)
- *  - Continue as guest → Better Auth's anonymous plugin creates a real
- *    user row instantly; signing in later links it, keeping all synced data.
+ * The welcome screen. Moneta requires an identity so profiles, ledgers,
+ * history, and custom rates live per-user and sync across devices — but
+ * "identity" includes a one-tap guest: no email, no password, full
+ * functionality, and it links into a real account later if the guest ever
+ * signs in on the same browser.
  */
 export default function LoginForm() {
   const router = useRouter()
@@ -91,11 +90,11 @@ export default function LoginForm() {
   }
 
   return (
-    <section className="card glow-card" style={{ maxWidth: 480 }}>
-      <h2>Sign in</h2>
+    <section className="card glow-card">
+      <h2>Welcome in</h2>
       <p className="empty-copy" style={{ marginBottom: 18 }}>
-        Sign in to sync your income profile, write-off ledger, saved history, and custom rates across devices.
-        Everything also works without an account — this only adds cross-device sync.
+        Your income profile, write-off ledger, saved calculations, and custom rates are kept per-account and
+        sync across devices. The fastest way in is a guest pass — one tap, everything works.
       </p>
 
       {error && (
@@ -107,9 +106,16 @@ export default function LoginForm() {
         </div>
       )}
 
-      <button type="button" className="btn-primary" style={{ width: '100%', marginBottom: 18 }} onClick={handleGoogle} disabled={busy !== null}>
-        {busy === 'google' ? 'Redirecting…' : 'Continue with Google'}
-      </button>
+      <div className="auth-actions">
+        <button type="button" className="btn-primary" onClick={handleGoogle} disabled={busy !== null}>
+          {busy === 'google' ? 'Redirecting…' : 'Continue with Google'}
+        </button>
+        <button type="button" className="settings-secondary-btn" onClick={handleGuest} disabled={busy !== null}>
+          {busy === 'guest' ? 'Creating…' : 'Continue as guest'}
+        </button>
+      </div>
+
+      <p className="auth-divider">— or with email —</p>
 
       <form onSubmit={handleEmail}>
         <div style={{ display: 'flex', gap: 16, fontSize: 13, margin: '0 0 12px' }}>
@@ -142,13 +148,9 @@ export default function LoginForm() {
         </button>
       </form>
 
-      <p className="disclaimer" style={{ marginTop: 18 }}>
-        Or skip accounts entirely:{' '}
-        <button type="button" className="linklike" onClick={handleGuest} disabled={busy !== null}>
-          {busy === 'guest' ? 'Creating…' : 'continue as a guest'}
-        </button>{' '}
-        — you get full sync right away, and if you later sign in with Google or email on this same browser,
-        your guest data carries over automatically.
+      <p className="disclaimer">
+        Guests get a real account instantly — and if you later sign in with Google or email on this same
+        browser, everything you saved as a guest carries over automatically.
       </p>
     </section>
   )

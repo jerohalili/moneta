@@ -2,6 +2,7 @@ import { Fraunces, IBM_Plex_Mono, Inter } from 'next/font/google'
 import AppNav from '@/components/AppNav'
 import TaxConfigSync from '@/components/TaxConfigSync'
 import CloudSyncManager from '@/components/CloudSyncManager'
+import AuthGate from '@/components/AuthGate'
 import './globals.css'
 
 const fraunces = Fraunces({
@@ -51,7 +52,9 @@ export default function RootLayout({ children }) {
         <CloudSyncManager />
         <div className="app-shell">
           <AppNav />
-          <main className="container">{children}</main>
+          <main className="container">
+            <AuthGate>{children}</AuthGate>
+          </main>
         </div>
       </body>
     </html>

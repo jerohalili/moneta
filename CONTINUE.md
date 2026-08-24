@@ -56,6 +56,12 @@ The person approved the stack: **Vercel (deploy) + Neon (Postgres) + Better Auth
 - **Guest flow**: `anonymous()` plugin server-side + `anonymousClient()` client-side (BOTH required or signIn.anonymous doesn't exist). Guest = real user row (`isAnonymous=true`); signing in later with Google/email ON THE SAME BROWSER links accounts → same user.id → all synced rows survive automatically. Nav shows a guest badge via `AccountButton`.
 - Email verification is deliberately OFF (`emailAndPassword.enabled` only) — turning on `requireEmailVerification` needs a transactional mailer (Resend) first. That plus privacy/terms pages + rate-limiting review are the remaining public-launch items.
 
+### Follow-up: auth is now the front door + History v2
+
+- **`components/AuthGate.js`** wraps `{children}` in layout: every route except `/login` requires a session (account OR guest); signed-out visitors get the splash → redirect to `/login`; signed-in users visiting `/login` get sent home. APIs were already failing closed — this aligned the UI with the server. localStorage still mirrors everything, so offline reads work and pre-auth typing (none possible now) would have merged dirty-wins anyway.
+- **`/login` redesigned** as a centered welcome screen (`.auth-shell/.auth-box/.auth-brand`): Google + guest as equal primary buttons, email form below a divider. Guest copy explains it's instant and links into a real account later.
+- **History rebuilt**: filter chips per calculator name, expandable rows revealing the full saved `details` figure set (money keys via formatPHP, `*rate*` keys via formatPercent, primitives only), Export JSON, cloud-synced disclaimer. The details data was always stored — this page finally surfaces it.
+
 ### Setup checklist (the person's part — code won't run against a DB until done)
 
 1. **Neon**: Vercel project → Storage → create Neon Postgres → copy `DATABASE_URL` into local `.env.local` AND Vercel env vars.
