@@ -10,6 +10,7 @@ import { getFreelancerTips } from '@/lib/advisor'
 import { EXPENSE_CATEGORIES } from '@/lib/expenseCategories'
 import { formatPHP } from '@/lib/format'
 import { loadJSON, saveJSON } from '@/lib/localStore'
+import { VAT_THRESHOLD } from '@/data/taxRates2026'
 
 export const PROFILE_TYPES = [
   { id: 'employee', label: 'Employee', description: 'Compensation income, one employer.' },
@@ -196,6 +197,15 @@ export function useIncomeProfile() {
   const effectiveRate = hasAnyIncome && grossIncome > 0 ? estimatedTax / grossIncome : null
   const takeHome = hasAnyIncome ? grossIncome - totalDeductions - estimatedTax : null
 
+  // Smart suggestion: gross receipts above the VAT threshold force VAT
+  // registration regardless of what the business/8% comparison above
+  // says — compareRoutes() already excludes the 8% option once this
+  // happens, but the person still needs to be told explicitly that
+  // registration itself is now mandatory, not just "the 8% option is
+  // gone." grossReceipts here is the entered figure, not a run-rate
+  // projection — this only fires once the actual number crosses the line.
+  const exceedsVatThreshold = hasBusinessIncome && grossReceipts > VAT_THRESHOLD
+
   function addEntry() {
     const amount = Number(draft.amount)
     if (!draft.label.trim() || !amount || amount <= 0) return
@@ -248,9 +258,11 @@ export function useIncomeProfile() {
     tips,
     categoryTotals,
     errors,
+    grossIncome,
     netIncomePreTax,
     estimatedTax,
     effectiveRate,
     takeHome,
+    exceedsVatThreshold,
   }
 }

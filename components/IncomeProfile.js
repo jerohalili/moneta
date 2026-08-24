@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useIncomeProfile } from '@/hooks/useIncomeProfile'
 import { formatPHP, formatPercent } from '@/lib/format'
+import { VAT_THRESHOLD } from '@/data/taxRates2026'
 import ProfileTypeSelector from './ProfileTypeSelector'
 import StatTile from './StatTile'
 import FilingCountdown from './FilingCountdown'
@@ -116,6 +117,23 @@ export default function IncomeProfile() {
       )}
 
       <ErrorFlags errors={p.errors} />
+
+      {p.exceedsVatThreshold && (
+        <div className="error-flags">
+          <div className="error-flag" style={{ color: 'var(--accent)', background: 'var(--accent-soft)', borderColor: 'var(--accent)' }}>
+            <span className="error-flag-icon" aria-hidden="true">ℹ</span>
+            Your gross receipts/sales are above {formatPHP(VAT_THRESHOLD)} — VAT registration is mandatory, and the
+            8% flat-tax option is no longer available to you. <Link href="/calculators/business">Use the VAT calculator →</Link>
+          </div>
+        </div>
+      )}
+
+      {p.hasAnyIncome && (
+        <p style={{ fontSize: 15, lineHeight: 1.5, marginBottom: 16 }}>
+          <strong>{PROFILE_LABELS[p.profileType]}</strong> — {formatPHP(p.grossIncome)} gross this year, an
+          effective tax rate of {formatPercent(p.effectiveRate)}, leaving roughly {formatPHP(p.takeHome)} take-home.
+        </p>
+      )}
 
       {p.profileType !== null && (
         <div className="stat-grid">

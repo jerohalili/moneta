@@ -1,4 +1,5 @@
 import IncomeProfile from '@/components/IncomeProfile'
+import DashboardHistoryPreview from '@/components/DashboardHistoryPreview'
 
 const ROADMAP_TILES = [
   {
@@ -7,9 +8,9 @@ const ROADMAP_TILES = [
     why: "Needs VAT input/output-credit logic that isn't modeled yet. Percentage tax for non-VAT businesses is live in the Business Taxes calculator.",
   },
   {
-    name: 'Historical Archive',
-    description: 'Multi-year lookups to compare how your tax position changed year over year.',
-    why: 'Needs an account + database to persist anything between visits — planned, not built.',
+    name: 'Full Historical Archive',
+    description: 'Cross-device, multi-year lookups to compare how your tax position changed over time.',
+    why: 'A local, browser-only version already exists — see Recent History above and the full History page. This tile is about syncing that across devices, which needs an account + database.',
   },
 ]
 
@@ -24,6 +25,8 @@ export default function Dashboard() {
       </div>
 
       <IncomeProfile />
+
+      <DashboardHistoryPreview />
 
       <div className="section-heading">
         <h2>On the roadmap</h2>

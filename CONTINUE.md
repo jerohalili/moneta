@@ -47,6 +47,14 @@ The whole Income Profile (`profileType`, both income figures, the write-off ledg
 ### Dashboard auto-orchestration — partially addressed
 For Employee/Mixed profiles, `useIncomeProfile` now also runs `computeNetPay()` and `computeThirteenthMonthPay()` automatically off the same stored compensation figure, and `components/IncomeProfile.js` renders those results directly in a new "Net Pay & 13th Month Pay" section — not just a link out to those calculators anymore. Business-side profiles (Freelancer/Business/Mixed) already had this pattern from an earlier session (cheapest-route + tips shown inline). **Not done:** anything beyond these two — e.g. auto-suggesting BMBE eligibility would need a new "business assets" field the Income Profile doesn't currently collect. If asked to go further here, that's the natural next data point to add.
 
+## This session: three more Dashboard improvements
+
+Asked "can the Dashboard be improved further" — reviewed the actual current component and found three concrete, low-effort/high-value gaps:
+
+1. **VAT threshold suggestion.** `hooks/useIncomeProfile.js` now exposes `exceedsVatThreshold` (gross receipts > `VAT_THRESHOLD`, ₱3M — reuses the constant already in `data/taxRates2026.js`, doesn't duplicate it). `compareRoutes()` already silently drops the 8% option once receipts cross this line, but nothing told the person *why* or that VAT registration is now mandatory. `IncomeProfile.js` now shows an explicit info-styled banner with a link to the VAT calculator when this fires.
+2. **Plain-language headline summary.** A one-line sentence now sits above the stat grid — "Freelancer — ₱850,000 gross this year, an effective tax rate of 5.2%, leaving roughly ₱X take-home." Synthesizes the four stat tiles into one readable takeaway instead of requiring the person to piece it together themselves. Needed exposing `grossIncome` from the hook (it was already computed internally, just wasn't returned).
+3. **Recent History preview on the Dashboard itself.** `components/DashboardHistoryPreview.js` (new) reads the same `lib/history.js` log the History page uses and shows the last 4 saved entries directly on the Dashboard, with a link to the full page. Renders nothing if there's no history yet, rather than showing an empty state on every visit. This also let the "Historical Archive" roadmap tile get an honest rename to "Full Historical Archive" — the *local* version now exists; what's still missing is cross-device sync, which needs the account/database layer.
+
 ## Verified working
 
 - `npm install && npx eslint .` — clean, zero errors, full project
