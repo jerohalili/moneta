@@ -15,6 +15,13 @@ import { applyStoredOverrides } from '@/lib/taxConfig'
 export default function TaxConfigSync() {
   useEffect(() => {
     applyStoredOverrides()
+    // A cloud pull can replace the stored overrides wholesale (e.g. first
+    // sign-in on a new device). Re-apply so live rates match what's on disk.
+    function onImported() {
+      applyStoredOverrides()
+    }
+    window.addEventListener('moneta:data-imported', onImported)
+    return () => window.removeEventListener('moneta:data-imported', onImported)
   }, [])
   return null
 }

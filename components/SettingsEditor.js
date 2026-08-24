@@ -31,6 +31,8 @@ export default function SettingsEditor() {
 
   function refreshOverrides() {
     setOverridesMap({ ...getStoredOverrides() })
+    // CloudSyncManager pushes the new override set for signed-in users.
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('moneta:rates-changed'))
   }
 
   function handleCommit(key, value) {

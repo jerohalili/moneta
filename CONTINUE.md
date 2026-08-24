@@ -42,6 +42,32 @@ The person's brief, verbatim intent: the old Dashboard "doesn't really do anythi
 - `npm run build` — clean, 25 routes incl. `/settings`
 - A throwaway Node smoke suite (40 checks, run outside the repo against the real modules via a `@/`-resolution loader hook): bracket boundary math, route comparison totals, mixed-earner exemption suppression, live override→recompute→reset round trips, Infinity survival through clone/reset/import, import validation rejections, advisor plan composition for freelancer/business/employee scenarios, BMBE impact = income-tax-share-only. All green. Recreate it if touching `lib/taxConfig.js` or `lib/advisor.js`.
 
+## This session: Better Auth + Neon + cloud sync (guests included)
+
+The person approved the stack: **Vercel (deploy) + Neon (Postgres) + Better Auth** with Google, email+password, AND a guest account. Code is complete and verified (`eslint` clean, `next build` clean, 25 routes + `/login`). What remains is pure dashboard work by the person — see "Setup checklist" below; nothing in code is blocked on it except a live database.
+
+### Architecture
+
+- **Auth = `better-auth@1.x`**, lazy-initialized in `lib/auth.js` (`getAuth()`) because construction needs env vars that don't exist during `next build`. Same lazy pattern in `lib/db/index.js` (`getDb()` wraps `neon(DATABASE_URL)` HTTP driver + Drizzle). Route handlers resolve per-request.
+- **Schema (`lib/db/schema.js`)**: Better Auth's four tables (`user` incl. `is_anonymous`, `session`, `account` w/ provider-unique index, `verification`) plus three app tables — `income_profiles` (jsonb blob, mirrors localStorage shape exactly), `rate_overrides` (jsonb), `history_entries` (client-id PK + jsonb payload). ALL reference `user.id ON DELETE CASCADE` → account deletion wipes everything.
+- **Sync API** under `/api/me/*`: `GET /data` (one-shot pull of everything), `PUT /profile`, `PUT /rates`, `POST/DELETE /history`. Every route guards via `lib/session.js` (`auth.api.getSession`) and zod-validates envelope + size (never field-by-field — the server stores snapshots, never computes). History POST checks id ownership before upsert so one user can't overwrite another's row.
+- **Client sync**: `components/CloudSyncManager.js` (mounted in layout, renders null) + `lib/cloudSync.js`. Events on `window`: `moneta:profile-changed` (from useIncomeProfile save effect), `moneta:rates-changed` (SettingsEditor), `moneta:history-changed` (lib/history.js, CustomEvent detail carries `{addedId|deletedId|cleared}`), `moneta:data-imported` (manager → hooks re-hydrate; TaxConfigSync re-applies overrides).
+- **Merge policy (deliberate)**: profile/rates = dirty-wins (local edits not yet pushed beat remote on sign-in; otherwise remote adopts over local when different); history = union-by-id newest-first, deletes/clears forward to server via event detail so entries don't resurrect. Pushes are debounced 1s; failures stay dirty and retry on next change. No clocks consulted anywhere.
+- **Guest flow**: `anonymous()` plugin server-side + `anonymousClient()` client-side (BOTH required or signIn.anonymous doesn't exist). Guest = real user row (`isAnonymous=true`); signing in later with Google/email ON THE SAME BROWSER links accounts → same user.id → all synced rows survive automatically. Nav shows a guest badge via `AccountButton`.
+- Email verification is deliberately OFF (`emailAndPassword.enabled` only) — turning on `requireEmailVerification` needs a transactional mailer (Resend) first. That plus privacy/terms pages + rate-limiting review are the remaining public-launch items.
+
+### Setup checklist (the person's part — code won't run against a DB until done)
+
+1. **Neon**: Vercel project → Storage → create Neon Postgres → copy `DATABASE_URL` into local `.env.local` AND Vercel env vars.
+2. **Secret**: `openssl rand -base64 32` → `BETTER_AUTH_SECRET` (both places). Set `BETTER_AUTH_URL` to `http://localhost:3000` locally and the prod URL on Vercel.
+3. **Google OAuth**: console.cloud.google.com → OAuth consent screen → Web client → Authorized redirect URI: `<BETTER_AUTH_URL>/api/auth/callback/google` (add BOTH localhost and prod lines) → put client ID/secret in `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`. Leave empty = Google button errors honestly instead of breaking anything else.
+4. **Tables**: `.env.local` has DATABASE_URL → `npx drizzle-kit push`.
+5. **Deploy**: `vercel --prod` (or push; Vercel auto-deploys).
+
+### Verified working
+- `npx eslint .` zero problems; `npm run build` clean (`/api/*` dynamic, `/login` static)
+- Build succeeds WITHOUT any env vars set (lazy init is load-bearing — keep it)
+
 ## Previous sessions (still accurate where not superseded above)
 
 ### Bug 3 — auto-computed contributions producing nonsense for tiny inputs

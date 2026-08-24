@@ -14,6 +14,12 @@ export default function DashboardHistoryPreview() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of localStorage, not a render-derivable value
     setEntries(getHistory())
+    // Cloud sync can add/remove entries after sign-in or a pull.
+    function refresh() {
+      setEntries(getHistory())
+    }
+    window.addEventListener('moneta:history-changed', refresh)
+    return () => window.removeEventListener('moneta:history-changed', refresh)
   }, [])
 
   // Nothing saved yet, or still loading — don't show an empty card on
@@ -40,9 +46,7 @@ export default function DashboardHistoryPreview() {
         ))}
       </ul>
       <p className="disclaimer" style={{ marginTop: 16 }}>
-        A local, browser-only history — not a full cross-device Historical Archive, which still needs an account
-        system (see the roadmap below). This already lets you glance back at how your numbers have moved over
-        time without waiting on that.
+        Saved to your account when you&apos;re signed in (synced across devices); browser-only otherwise.
       </p>
     </section>
   )

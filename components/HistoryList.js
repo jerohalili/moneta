@@ -12,6 +12,12 @@ export default function HistoryList() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of localStorage, not a render-derivable value
     setEntries(getHistory())
+    // Cloud sync can add/remove entries after sign-in or a pull.
+    function refresh() {
+      setEntries(getHistory())
+    }
+    window.addEventListener('moneta:history-changed', refresh)
+    return () => window.removeEventListener('moneta:history-changed', refresh)
   }, [])
 
   function handleDelete(id) {

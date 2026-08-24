@@ -142,6 +142,72 @@ body {
   border-bottom-color: var(--accent);
 }
 
+/* ---------- Account control (nav right) ---------- */
+
+.nav-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-account-spacer {
+  display: inline-block;
+  width: 64px;
+}
+
+.nav-account-name {
+  color: var(--ink);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-account-name:hover { color: var(--accent); }
+
+.nav-guest-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.nav-signout {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.nav-signout:hover:not(:disabled) {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.linklike {
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .theme-toggle {
   display: inline-flex;
   align-items: center;

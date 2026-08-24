@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import ThemeToggle from './ThemeToggle'
+import AccountButton from './AccountButton'
 
 const LINKS = [
   { href: '/', label: 'Dashboard' },
@@ -32,6 +33,7 @@ export default function AppNav() {
             </Link>
           ))}
           <ThemeToggle />
+          <AccountButton />
         </nav>
       </header>
     </div>

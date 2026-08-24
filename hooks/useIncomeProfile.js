@@ -87,7 +87,8 @@ export function useIncomeProfile() {
 
   // Persist on every change, but only after the initial load above has
   // run — otherwise this would fire first with blank default state and
-  // immediately overwrite whatever was actually saved.
+  // immediately overwrite whatever was actually saved. Also announces
+  // the change so CloudSyncManager can push it for signed-in users.
   useEffect(() => {
     if (!hydrated) return
     saveJSON(STORAGE_KEY, {
@@ -100,7 +101,30 @@ export function useIncomeProfile() {
       vatRegistered,
       ledger,
     })
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('moneta:profile-changed'))
   }, [hydrated, profileType, grossCompensationInput, contributionsOverride, useContributionsOverride, grossReceiptsInput, totalAssetsInput, vatRegistered, ledger])
+
+  // Cloud sync may replace the stored profile after sign-in (or when a
+  // guest upgrades to a real account). Re-read localStorage into state so
+  // the UI reflects what was just pulled — same field-by-field pattern as
+  // the hydration effect above.
+  useEffect(() => {
+    // Event-driven re-read of localStorage after a cloud pull — the rule
+    // correctly treats listener callbacks as user-originated, not render.
+    function rehydrate() {
+      const saved = loadJSON(STORAGE_KEY, null)
+      setProfileType(saved?.profileType ?? null)
+      setGrossCompensationInput(saved?.grossCompensationInput ?? '')
+      setContributionsOverride(saved?.contributionsOverride ?? '')
+      setUseContributionsOverride(saved?.useContributionsOverride ?? false)
+      setGrossReceiptsInput(saved?.grossReceiptsInput ?? '')
+      setTotalAssetsInput(saved?.totalAssetsInput ?? '')
+      setVatRegistered(saved?.vatRegistered ?? false)
+      setLedger(saved?.ledger ?? [])
+    }
+    window.addEventListener('moneta:data-imported', rehydrate)
+    return () => window.removeEventListener('moneta:data-imported', rehydrate)
+  }, [])
 
   const needsEmployeeFields = profileType === 'employee' || profileType === 'mixed'
   const needsBusinessFields = profileType === 'freelancer' || profileType === 'business' || profileType === 'mixed'
