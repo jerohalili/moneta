@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { computeThirteenthMonthPay } from '@/lib/thirteenthMonthPay'
 import { formatPHP } from '@/lib/format'
 import StatTile from './StatTile'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 export default function ThirteenthMonthCalculator() {
   const [basicInput, setBasicInput] = useState('')
@@ -28,11 +29,23 @@ export default function ThirteenthMonthCalculator() {
             value={basicInput}
             onChange={(e) => setBasicInput(e.target.value)}
           />
-          <p className="disclaimer" style={{ marginTop: 8 }}>
+          <p className="disclaimer" style={{ marginTop: 8, borderTop: 'none', paddingTop: 0 }}>
             Basic salary only — exclude overtime, holiday pay, allowances, and other benefits; those aren&apos;t
             part of the statutory 13th-month computation.
           </p>
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="13th Month Pay"
+          summary={hasIncome ? `${formatPHP(result.thirteenthMonthPay)} on ${formatPHP(basic)} basic` : ''}
+          details={{
+            totalBasicSalary: basic,
+            thirteenthMonthPay: result?.thirteenthMonthPay,
+            exemptAmount: result?.exemptAmount,
+            taxableAmount: result?.taxableAmount,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="stat-grid">

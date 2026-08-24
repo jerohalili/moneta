@@ -6,8 +6,9 @@ import { saveHistoryEntry } from '@/lib/history'
 /**
  * Live recalculation stays automatic (no "Calculate" button) — this button
  * is a separate, deliberate action: "keep a dated record of this specific
- * result." Without an explicit save action, there's no discrete moment to
- * log, since the numbers are continuously changing as someone types.
+ * result." It lives at the bottom of the INPUT card (right where the
+ * numbers are typed), renders as a full-width green call-to-action, and is
+ * disabled until there's something worth saving.
  */
 export default function SaveToHistoryButton({ calculatorName, summary, details, disabled = false }) {
   const [justSaved, setJustSaved] = useState(false)
@@ -19,8 +20,13 @@ export default function SaveToHistoryButton({ calculatorName, summary, details, 
   }
 
   return (
-    <button type="button" className="btn-primary" onClick={handleSave} disabled={disabled}>
-      {justSaved ? 'Saved ✓' : 'Save to History'}
+    <button
+      type="button"
+      className={justSaved ? 'save-btn is-saved' : 'save-btn'}
+      onClick={handleSave}
+      disabled={disabled}
+    >
+      {justSaved ? 'Saved ✓ — in History' : 'Save to History'}
     </button>
   )
 }

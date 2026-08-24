@@ -32,6 +32,19 @@ export default function FreelancerWorkbench() {
             onChange={(e) => wb.setGrossReceiptsInput(e.target.value)}
           />
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Freelancer / Self-Employed Tax"
+          summary={wb.hasIncome ? `${wb.comparison.best.method.replace('-', ' ')} route — tax ${formatPHP(wb.comparison.best.total)}` : ''}
+          details={{
+            grossReceipts: wb.grossReceipts,
+            itemizedExpenses: wb.itemizedExpenses,
+            bestRoute: wb.comparison?.best?.method,
+            estimatedTax: wb.estimatedTax,
+            takeHome: wb.takeHome,
+          }}
+          disabled={!wb.hasIncome}
+        />
       </section>
 
       <ErrorFlags errors={wb.errors} />
@@ -42,22 +55,6 @@ export default function FreelancerWorkbench() {
         <StatTile label="Effective Rate" value={wb.hasIncome ? formatPercent(wb.effectiveRate) : '—'} />
         <StatTile label="Est. Take-Home" value={wb.hasIncome ? formatPHP(wb.takeHome) : '—'} />
       </div>
-
-      {wb.hasIncome && (
-        <div style={{ marginBottom: 20 }}>
-          <SaveToHistoryButton
-            calculatorName="Freelancer / Self-Employed Tax"
-            summary={`${wb.comparison.best.method.replace('-', ' ')} route — tax ${formatPHP(wb.comparison.best.total)}`}
-            details={{
-              grossReceipts: wb.grossReceipts,
-              itemizedExpenses: wb.itemizedExpenses,
-              bestRoute: wb.comparison.best.method,
-              estimatedTax: wb.estimatedTax,
-              takeHome: wb.takeHome,
-            }}
-          />
-        </div>
-      )}
 
       <div className="dashboard-row">
         <section className="card">

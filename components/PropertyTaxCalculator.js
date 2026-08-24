@@ -6,6 +6,7 @@ import { computeRealPropertyTax } from '@/lib/realPropertyTax'
 import { formatPHP } from '@/lib/format'
 import { RATES } from '@/lib/taxConfig'
 import StatTile from './StatTile'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 const MODES = [
   { id: 'sale', label: 'Sale of Real Property', description: 'Capital gains tax + documentary stamp tax.' },
@@ -94,6 +95,28 @@ function SaleMode() {
           <label htmlFor="notarized-date">Date of notarization (optional, for filing deadlines)</label>
           <input id="notarized-date" type="date" value={notarizedInput} onChange={(e) => setNotarizedInput(e.target.value)} />
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Property Sale (CGT + DST)"
+          summary={
+            hasIncome
+              ? `${formatPHP(cgt.tax + dst.tax)} total on ${formatPHP(cgt.base)} base`
+              : ''
+          }
+          details={{
+            sellingPrice: sellingPrice || null,
+            zonalValue: zonalValue || null,
+            fairMarketValue: fairMarketValue || null,
+            taxBaseUsed: cgt?.base,
+            capitalGainsTax: cgt?.tax,
+            documentaryStampTax: dst?.tax,
+            totalDue: cgt && dst ? cgt.tax + dst.tax : null,
+            notarizationDate: notarizedInput || null,
+            cgtDeadline: cgtDeadline?.toISOString().slice(0, 10) ?? null,
+            dstDeadline: dstDeadline?.toISOString().slice(0, 10) ?? null,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="stat-grid">
@@ -159,6 +182,21 @@ function EstateMode() {
           <label htmlFor="other-deductions">Other allowable deductions (funeral, medical, claims against the estate, etc.) (₱)</label>
           <input id="other-deductions" type="number" inputMode="decimal" placeholder="e.g. 300000" value={otherInput} onChange={(e) => setOtherInput(e.target.value)} />
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Estate Tax"
+          summary={hasIncome ? `${formatPHP(result.tax)} on ${formatPHP(result.netEstate)} net estate` : ''}
+          details={{
+            grossEstate,
+            familyHomeValueDeclared: familyHomeValue || null,
+            familyHomeDeductionApplied: result?.familyHomeDeduction,
+            standardDeduction: result?.standardDeduction,
+            otherDeductions: otherDeductions || null,
+            netTaxableEstate: result?.netEstate,
+            estateTax: result?.tax,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="stat-grid">
@@ -192,10 +230,22 @@ function DonorMode() {
         <div className="field">
           <label htmlFor="net-gifts">Total net gifts this calendar year (₱)</label>
           <input id="net-gifts" type="number" inputMode="decimal" placeholder="e.g. 1000000" value={giftsInput} onChange={(e) => setGiftsInput(e.target.value)} />
-          <p className="disclaimer" style={{ marginTop: 8 }}>
+          <p className="disclaimer" style={{ marginTop: 8, borderTop: 'none', paddingTop: 0 }}>
             The ₱250,000 exemption is cumulative per calendar year across all your donations, not per gift.
           </p>
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Donor's Tax"
+          summary={hasIncome ? `${formatPHP(result.tax)} on ${formatPHP(result.taxableGifts)} taxable gifts` : ''}
+          details={{
+            netGiftsThisYear,
+            yearlyExemption: result?.exemption,
+            taxableGifts: result?.taxableGifts,
+            donorsTax: result?.tax,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="stat-grid">
@@ -248,6 +298,25 @@ function RptMode() {
             <option value="city">City / Metro Manila municipality (2% ceiling)</option>
           </select>
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Real Property Tax (Annual)"
+          summary={
+            hasIncome
+              ? `${formatPHP(result.total)}/yr (${locationType === 'city' ? 'city' : 'province'} ceiling) on ${formatPHP(assessedValue)}`
+              : ''
+          }
+          details={{
+            assessedValue,
+            location: locationType === 'city' ? 'City / Metro Manila' : 'Province',
+            baseRateCeiling: result?.baseRate,
+            basicRpt: result?.basicTax,
+            specialEducationFund: result?.sefTax,
+            annualTotal: result?.total,
+            perQuarter: result?.quarterly,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="stat-grid">
@@ -314,6 +383,17 @@ function OtherDstMode() {
           </label>
           <input id="instrument-amount" type="number" inputMode="decimal" placeholder="e.g. 500000" value={amountInput} onChange={(e) => setAmountInput(e.target.value)} />
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="DST — Loan/Lease"
+          summary={hasIncome ? `${formatPHP(tax)} on ${formatPHP(amount)} (${instrumentType})` : ''}
+          details={{
+            instrumentType: instrumentType === 'loan' ? 'Loan / debt instrument' : 'Lease agreement',
+            contractAmount: amount,
+            documentaryStampTax: tax,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="stat-grid">

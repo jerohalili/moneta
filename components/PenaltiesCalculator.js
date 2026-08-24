@@ -5,6 +5,7 @@ import { computePenalties } from '@/lib/penalties'
 import { formatPHP } from '@/lib/format'
 import StatTile from './StatTile'
 import ErrorFlags from './ErrorFlags'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 export default function PenaltiesCalculator() {
   const [taxInput, setTaxInput] = useState('')
@@ -44,6 +45,26 @@ export default function PenaltiesCalculator() {
           <input type="checkbox" checked={isMicroSmall} onChange={(e) => setIsMicroSmall(e.target.checked)} />
           I&apos;m classified as a Micro or Small taxpayer under the Ease of Paying Taxes Act (reduced rates)
         </label>
+
+        <SaveToHistoryButton
+          calculatorName="BIR Penalties"
+          summary={
+            hasIncome
+              ? `${formatPHP(result.total)} total on ${formatPHP(basicTax)} basic, ${daysLate} days late${isFraud ? ' (fraud)' : ''}${isMicroSmall ? ' (micro/small)' : ''}`
+              : ''
+          }
+          details={{
+            basicTax,
+            daysLate,
+            willfulNeglectOrFraud: isFraud,
+            microSmallClassification: isMicroSmall,
+            surcharge: result?.surcharge,
+            interest: result?.interest,
+            compromiseEstimate: result?.compromise,
+            totalAmountDue: result?.total,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <ErrorFlags errors={errors} />

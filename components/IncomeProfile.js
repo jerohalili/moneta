@@ -20,6 +20,25 @@ function businessLabel(profileType) {
   return 'Gross receipts this year (₱)'
 }
 
+/** The Dashboard's snapshot is the richest one in the app: headline figures,
+ * plus the advisor's top actions and the ledger itself, so History can show
+ * WHY a number was what it was on that date. */
+function dashboardSnapshot(p) {
+  return {
+    profileType: p.profileType,
+    grossIncome: p.grossIncome,
+    netIncomePreTax: p.netIncomePreTax,
+    estimatedTax: p.estimatedTax,
+    effectiveRate: p.effectiveRate,
+    takeHome: p.takeHome,
+    businessRoute: p.businessComparison?.best?.method ?? null,
+    actionPlan: Array.isArray(p.advicePlan?.actions)
+      ? p.advicePlan.actions.slice(0, 5).map((a) => ({ title: a.title, impact: a.impact }))
+      : [],
+    ledger: p.ledger.slice(0, 50).map((e) => ({ label: e.label, amount: e.amount })),
+  }
+}
+
 const PROFILE_LABELS = {
   employee: 'Employee',
   freelancer: 'Freelancer',
@@ -97,6 +116,15 @@ export default function IncomeProfile() {
             Enter regular taxable compensation only — exclude 13th-month pay and other de minimis benefits up to
             ₱90,000, since those are tax-exempt.
           </p>
+
+          {!p.needsBusinessFields && (
+            <SaveToHistoryButton
+              calculatorName="Income Profile"
+              summary={p.hasAnyIncome ? `${PROFILE_LABELS[p.profileType]} — net ${formatPHP(p.netIncomePreTax)}, tax ${formatPHP(p.estimatedTax)}` : ''}
+              details={dashboardSnapshot(p)}
+              disabled={!p.hasAnyIncome}
+            />
+          )}
         </section>
       )}
 
@@ -138,6 +166,13 @@ export default function IncomeProfile() {
             />
             I&apos;m already VAT-registered
           </label>
+
+          <SaveToHistoryButton
+            calculatorName="Income Profile"
+            summary={p.hasAnyIncome ? `${PROFILE_LABELS[p.profileType] ?? p.profileType} — net ${formatPHP(p.netIncomePreTax)}, tax ${formatPHP(p.estimatedTax)}` : ''}
+            details={dashboardSnapshot(p)}
+            disabled={!p.hasAnyIncome}
+          />
         </section>
       )}
 
@@ -166,22 +201,6 @@ export default function IncomeProfile() {
           <StatTile label="Estimated Tax Owed" value={p.hasAnyIncome ? formatPHP(p.estimatedTax) : '—'} />
           <StatTile label="Effective Rate" value={p.hasAnyIncome ? formatPercent(p.effectiveRate) : '—'} />
           <StatTile label="Est. Take-Home" value={p.hasAnyIncome ? formatPHP(p.takeHome) : '—'} />
-        </div>
-      )}
-
-      {p.hasAnyIncome && (
-        <div style={{ marginBottom: 20 }}>
-          <SaveToHistoryButton
-            calculatorName="Income Profile"
-            summary={`${PROFILE_LABELS[p.profileType] ?? p.profileType} — net ${formatPHP(p.netIncomePreTax)}, tax ${formatPHP(p.estimatedTax)}`}
-            details={{
-              profileType: p.profileType,
-              netIncomePreTax: p.netIncomePreTax,
-              estimatedTax: p.estimatedTax,
-              effectiveRate: p.effectiveRate,
-              takeHome: p.takeHome,
-            }}
-          />
         </div>
       )}
 

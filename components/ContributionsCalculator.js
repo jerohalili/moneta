@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { computeMonthlyContributions } from '@/lib/contributions'
 import { formatPHP } from '@/lib/format'
 import StatTile from './StatTile'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 export default function ContributionsCalculator() {
   const [monthlyInput, setMonthlyInput] = useState('')
@@ -29,6 +30,22 @@ export default function ContributionsCalculator() {
             onChange={(e) => setMonthlyInput(e.target.value)}
           />
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Contributions"
+          summary={hasIncome ? `${formatPHP(result.totalEmployee)}/mo employee share at ${formatPHP(monthly)} monthly` : ''}
+          details={{
+            monthlyCompensation: monthly,
+            estimatedMsc: result?.msc,
+            sssEmployee: result?.sss?.employee,
+            philhealthEmployee: result?.philhealth?.employee,
+            pagibigEmployee: result?.pagibig?.employee,
+            totalEmployeeMonthly: result?.totalEmployee,
+            totalEmployerMonthly: result?.totalEmployer,
+            totalEmployeeAnnual: result ? result.totalEmployee * 12 : null,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="stat-grid">

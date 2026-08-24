@@ -118,7 +118,7 @@ export default function LoginForm() {
       <p className="auth-divider">— or with email —</p>
 
       <form onSubmit={handleEmail}>
-        <div style={{ display: 'flex', gap: 16, fontSize: 13, margin: '0 0 12px' }}>
+        <div className="auth-mode-toggle">
           <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 0 }}>
             <input type="radio" checked={mode === 'signin'} onChange={() => setMode('signin')} />
             I have an account

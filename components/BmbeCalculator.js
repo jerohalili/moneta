@@ -5,6 +5,7 @@ import { computeBmbeSavings } from '@/lib/bmbe'
 import { formatPHP } from '@/lib/format'
 import { RATES } from '@/lib/taxConfig'
 import StatTile from './StatTile'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 export default function BmbeCalculator() {
   const [assetsInput, setAssetsInput] = useState('')
@@ -37,6 +38,21 @@ export default function BmbeCalculator() {
           <label htmlFor="bmbe-expenses">Itemized business expenses, if any (₱)</label>
           <input id="bmbe-expenses" type="number" inputMode="decimal" placeholder="e.g. 200000" value={expensesInput} onChange={(e) => setExpensesInput(e.target.value)} />
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="BMBE Savings"
+          summary={hasIncome ? (result.eligible ? `Eligible — saves ${formatPHP(result.savings)}/yr` : 'Not eligible — assets over ceiling') : ''}
+          details={{
+            totalAssets,
+            grossReceipts,
+            itemizedExpenses,
+            eligible: result?.eligible,
+            incomeTaxWithoutBmbe: result?.incomeTaxWithoutBmbe,
+            incomeTaxAsBmbe: result?.incomeTaxAsBmbe,
+            annualSavings: result?.savings,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       {hasIncome && (

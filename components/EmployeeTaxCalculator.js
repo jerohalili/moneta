@@ -51,10 +51,22 @@ export default function EmployeeTaxCalculator() {
             value={contributionsInput}
             onChange={(e) => setContributionsInput(e.target.value)}
           />
-          <p className="disclaimer" style={{ marginTop: 8 }}>
+          <p className="disclaimer" style={{ marginTop: 8, borderTop: 'none', paddingTop: 0 }}>
             Not sure? Use the Contributions calculator to compute this automatically from your monthly pay.
           </p>
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Employee Income Tax"
+          summary={hasIncome ? `Tax ${formatPHP(result.incomeTax)} on ${formatPHP(gross)} gross` : ''}
+          details={{
+            grossCompensation: gross,
+            contributions,
+            taxableCompensation: result?.taxableCompensation,
+            incomeTax: result?.incomeTax,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <ErrorFlags errors={errors} />
@@ -65,21 +77,6 @@ export default function EmployeeTaxCalculator() {
         <StatTile label="Effective Rate" value={hasIncome ? formatPercent(effectiveRate) : '—'} />
         <StatTile label="Est. Take-Home" value={hasIncome ? formatPHP(gross - contributions - result.incomeTax) : '—'} />
       </div>
-
-      {hasIncome && (
-        <div style={{ marginBottom: 20 }}>
-          <SaveToHistoryButton
-            calculatorName="Employee Income Tax"
-            summary={`Tax ${formatPHP(result.incomeTax)} on ${formatPHP(gross)} gross`}
-            details={{
-              grossCompensation: gross,
-              contributions,
-              taxableCompensation: result.taxableCompensation,
-              incomeTax: result.incomeTax,
-            }}
-          />
-        </div>
-      )}
 
       <section className="card">
         <h2>How this is computed</h2>

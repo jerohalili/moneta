@@ -86,6 +86,19 @@ body {
   border-bottom: 1px solid var(--rule);
   box-shadow: var(--card-shadow);
   margin-bottom: 40px;
+  /* Stay visible while scrolling long result pages — the nav IS the
+     app's wayfinding and the account menu lives in it. */
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+a:focus-visible,
+button:focus-visible,
+[role='menuitem']:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
 }
 
 .masthead {
@@ -145,29 +158,47 @@ body {
 /* ---------- Account control (nav right) ---------- */
 
 .nav-account {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
 }
 
 .nav-account-spacer {
   display: inline-block;
-  width: 64px;
+  width: 72px;
 }
 
-.nav-account-name {
-  color: var(--ink);
-  text-decoration: none;
+.account-trigger {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  max-width: 160px;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 6px 10px;
+  cursor: pointer;
+  max-width: 200px;
+}
+
+.account-trigger:hover,
+.account-trigger.is-open {
+  border-color: var(--rule);
+  background: rgba(var(--glass-rgb), 0.6);
+}
+
+.account-trigger-label {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.nav-account-name:hover { color: var(--accent); }
+.account-caret {
+  font-size: 9px;
+  color: var(--ink-soft);
+}
 
 .nav-guest-badge {
   font-family: var(--font-mono);
@@ -180,21 +211,111 @@ body {
   padding: 1px 6px;
 }
 
-.nav-signout {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--ink-soft);
-  background: none;
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  padding: 5px 12px;
-  cursor: pointer;
-  line-height: 1.2;
+.account-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 230px;
+  background: var(--paper-raised);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--card-shadow);
+  border-radius: 12px;
+  padding: 6px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
 }
 
-.nav-signout:hover:not(:disabled) {
+.account-menu-head {
+  padding: 10px 12px 12px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 6px;
+}
+
+.account-menu-name {
+  font-weight: 600;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-menu-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-top: 3px;
+  line-height: 1.45;
+}
+
+.account-menu-item {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  background: none;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  display: block;
+  width: 100%;
+}
+
+.account-menu-item:hover:not(:disabled) {
+  background: var(--accent-soft);
+}
+
+.account-menu-item.is-danger {
   color: var(--danger);
-  border-color: var(--danger);
+  border-top: 1px solid var(--rule);
+  margin-top: 4px;
+  border-radius: 0 0 8px 8px;
+}
+
+.account-menu-item.is-danger:hover:not(:disabled) {
+  background: var(--danger-soft);
+}
+
+/* ---------- Save-to-History call-to-action ---------- */
+
+.save-btn {
+  display: block;
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+  border: none;
+  border-radius: 999px;
+  padding: 11px 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(20, 128, 74, 0.35);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+  white-space: nowrap;
+  /* Breathing room from the fields above; the card's own padding closes
+     the space below so it never looks glued to the card edge. */
+  margin-top: 6px;
+}
+
+[data-theme='dark'] .save-btn {
+  color: #052015;
+}
+
+.save-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(20, 128, 74, 0.45);
+}
+
+.save-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.save-btn.is-saved {
+  background: var(--good);
 }
 
 .linklike {
@@ -241,6 +362,20 @@ body {
   color: var(--ink-soft);
   text-align: center;
   margin: 4px 0 20px;
+}
+
+/* Center the welcome card's heading and mode toggle with the rest of the
+   auth screen's symmetric composition. */
+.auth-box .card h2 {
+  text-align: center;
+}
+
+.auth-mode-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-size: 13px;
+  margin: 0 0 14px;
 }
 
 .auth-actions {
@@ -376,37 +511,88 @@ body {
 
 .history-detail {
   border-left: 2px solid var(--accent-soft);
-  margin: 4px 0 6px 6px;
-  padding-left: 14px;
+  margin: 2px 0 4px 6px;
+  padding-left: 12px;
 }
 
 .history-detail-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 10px 18px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px 14px;
   margin: 0;
 }
 
 .history-detail-item dt {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--ink-soft);
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
 
 .history-detail-item dd {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
+}
+
+.history-extra {
+  margin-top: 12px;
+}
+
+.history-extra-heading {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+
+.history-action-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.history-action-impact {
+  color: var(--good);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.history-ledger-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 3px 16px;
+  font-size: 12px;
+}
+
+.history-ledger-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px dashed var(--rule);
+  padding: 3px 0;
+}
+
+.history-ledger-list li span:last-child {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .history-detail-note {
   font-size: 11px;
   color: var(--ink-soft);
-  margin: 10px 0 0;
+  margin: 12px 0 0;
 }
 
 .theme-toggle {

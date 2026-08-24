@@ -5,6 +5,7 @@ import { computePercentageTax, computeVat } from '@/lib/percentageTax'
 import { formatPHP } from '@/lib/format'
 import { RATES } from '@/lib/taxConfig'
 import StatTile from './StatTile'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 const MODES = [
   { id: 'percentage', label: 'Percentage Tax', description: 'Non-VAT-registered, 3% of gross.' },
@@ -53,6 +54,24 @@ function PercentageMode() {
           <label htmlFor="gross-sales">Gross sales/receipts this quarter (₱)</label>
           <input id="gross-sales" type="number" inputMode="decimal" placeholder="e.g. 400000" value={grossInput} onChange={(e) => setGrossInput(e.target.value)} />
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Percentage Tax"
+          summary={
+            hasIncome
+              ? result.requiresVat
+                ? `VAT required at ${formatPHP(gross)} quarterly`
+                : `${formatPHP(result.tax)} on ${formatPHP(gross)} quarterly`
+              : ''
+          }
+          details={{
+            grossSalesQuarterly: gross,
+            percentageTaxRate: RATES.PERCENTAGE_TAX_RATE,
+            percentageTaxDue: result?.requiresVat ? null : result?.tax,
+            vatRegistrationRequired: result?.requiresVat ?? null,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       {hasIncome && result.requiresVat && (
@@ -105,6 +124,25 @@ function VatMode() {
           <label htmlFor="vatable-purchases">Vatable purchases/expenses this period (₱)</label>
           <input id="vatable-purchases" type="number" inputMode="decimal" placeholder="e.g. 400000" value={purchasesInput} onChange={(e) => setPurchasesInput(e.target.value)} />
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="VAT"
+          summary={
+            hasIncome
+              ? `${formatPHP(result.vatPayable)} payable (output ${formatPHP(result.outputVat)} − input ${formatPHP(result.inputVat)})`
+              : ''
+          }
+          details={{
+            vatableSales: vatableSales,
+            vatablePurchases: vatablePurchases,
+            vatRate: RATES.VAT_RATE,
+            outputVat: result?.outputVat,
+            inputVat: result?.inputVat,
+            vatPayable: result?.vatPayable,
+            excessInputVatCarryover: result?.excessInputVat,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="stat-grid">

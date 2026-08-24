@@ -139,7 +139,7 @@ export default function HistoryList() {
                         <dl className="history-detail-grid">
                           {detailRows(entry.details).map(([key, value]) => (
                             <div key={key} className="history-detail-item">
-                              <dt>{prettyKey(key)}</dt>
+                              <dt>{friendlyLabel(key)}</dt>
                               <dd>{formatValue(key, value)}</dd>
                             </div>
                           ))}
@@ -147,6 +147,8 @@ export default function HistoryList() {
                       ) : (
                         <p className="empty-copy">No figures were stored with this snapshot.</p>
                       )}
+                      <ActionPlanList actions={entry.details?.actionPlan} />
+                      <LedgerList ledger={entry.details?.ledger} />
                       <p className="history-detail-note">
                         Figures are as computed at save time — they don&apos;t update when rates change later.
                       </p>
@@ -169,18 +171,115 @@ export default function HistoryList() {
   )
 }
 
-/** Flattens the snapshot into display rows: primitives only, ordered with
- * money-ish fields first so the important numbers lead. */
+/** Flattens the snapshot into display rows. Empty/null values are dropped
+ * entirely (silence beats a wall of em-dashes), nested arrays are handled
+ * by their own renderers below, and money-ish fields sort to the front. */
 function detailRows(details) {
   if (!details || typeof details !== 'object') return []
-  const pairs = Object.entries(details).filter(
-    ([, v]) => v === null || typeof v !== 'object'
-  )
+  const pairs = Object.entries(details).filter(([key, v]) => {
+    if (v === null || v === undefined || v === '') return false
+    if (key === 'actionPlan' || key === 'ledger') return false
+    if (Array.isArray(v)) return false
+    if (typeof v === 'object') return false
+    return true
+  })
   const moneyFirst = (k) => (/tax|income|home|pay|receipt|sales|expense|contribution/i.test(k) ? 0 : 1)
   return pairs.sort((a, b) => moneyFirst(a[0]) - moneyFirst(b[0]))
 }
 
-function prettyKey(key) {
+const FRIENDLY_LABELS = {
+  profileType: 'Profile',
+  grossIncome: 'Gross income (year)',
+  netIncomePreTax: 'Net income, pre-tax',
+  estimatedTax: 'Est. tax owed',
+  effectiveRate: 'Effective rate',
+  takeHome: 'Take-home after tax',
+  businessRoute: 'Route chosen',
+  grossReceipts: 'Gross receipts',
+  itemizedExpenses: 'Itemized expenses',
+  grossCompensation: 'Gross compensation',
+  contributions: 'Contributions (year)',
+  monthlyGross: 'Monthly gross',
+  totalEmployeeMonthly: 'Your share, monthly',
+  totalEmployerMonthly: "Employer's share, monthly",
+  totalEmployeeAnnual: 'Your share, yearly',
+  estimatedMsc: 'Est. salary credit (SSS)',
+  sssEmployee: 'SSS — your share',
+  philhealthEmployee: 'PhilHealth — your share',
+  pagibigEmployee: 'Pag-IBIG — your share',
+  monthlyWithholdingTax: 'Withholding tax (mo.)',
+  netPay: 'Net pay (monthly)',
+  takeHomeRate: 'Take-home rate',
+  totalBasicSalary: 'Total basic salary',
+  thirteenthMonthPay: '13th month pay',
+  exemptAmount: 'Tax-exempt portion',
+  taxableAmount: 'Taxable excess',
+  taxableCompensation: 'Taxable compensation',
+  incomeTax: 'Income tax',
+  workType: 'Type of work',
+  hoursWorked: 'Hours worked',
+  nightDiffHours: 'Night-diff hours (10PM–6AM)',
+  multiplierApplied: 'Multiplier applied',
+  basePay: 'Base premium pay',
+  nightDiffPay: 'Night differential pay',
+  totalPay: 'Total overtime pay',
+  periodsCount: 'Periods in the year',
+  monthsCovered: 'Months covered',
+  category: 'Payment category',
+  rateApplied: 'Rate applied',
+  taxWithheld: 'Tax withheld',
+  netPayment: 'Net payment received',
+  eligible: 'BMBE eligible',
+  annualSavings: 'Annual savings',
+  incomeTaxWithoutBmbe: 'Income tax without BMBE',
+  incomeTaxAsBmbe: 'Income tax as BMBE',
+  qualifiesSmall: 'Small-corp rate qualified',
+  rcitRate: 'RCIT rate',
+  rcit: 'RCIT amount',
+  mcit: 'MCIT amount',
+  usedMcit: 'MCIT was higher',
+  taxDue: 'Total tax due',
+  percentageTaxDue: 'Percentage tax due',
+  vatRegistrationRequired: 'VAT registration required',
+  outputVat: 'Output VAT',
+  inputVat: 'Input VAT',
+  vatPayable: 'VAT payable',
+  excessInputVatCarryover: 'Excess input VAT (carryover)',
+  surcharge: 'Surcharge',
+  interest: 'Interest',
+  compromiseEstimate: 'Compromise penalty (est.)',
+  totalAmountDue: 'Total amount due',
+  unfiledReturnsCount: 'Unfiled returns',
+  minimumCompromisePerReturn: 'Minimum compromise each',
+  estimatedTotal: 'Estimated total',
+  taxBaseUsed: 'Tax base used (highest)',
+  capitalGainsTax: 'Capital gains tax (6%)',
+  documentaryStampTax: 'Documentary stamp tax',
+  notarizationDate: 'Date of notarization',
+  cgtDeadline: 'CGT deadline (30 days)',
+  dstDeadline: 'DST deadline (5th of next mo.)',
+  netTaxableEstate: 'Net taxable estate',
+  estateTax: 'Estate tax (6%)',
+  netGiftsThisYear: 'Net gifts this year',
+  yearlyExemption: 'Yearly exemption',
+  taxableGifts: 'Taxable gifts',
+  donorsTax: "Donor's tax (6%)",
+  baseRateCeiling: 'Base rate ceiling',
+  basicRpt: 'Basic RPT',
+  specialEducationFund: 'Special Education Fund (1%)',
+  annualTotal: 'Annual total',
+  perQuarter: 'Per quarter',
+  instrumentType: 'Instrument type',
+  contractAmount: 'Contract amount',
+  cheaperOption: 'Cheaper option',
+  solePropBestRoute: 'Sole-prop route used',
+  corporationTax: 'Corporation tax',
+  willfulNeglectOrFraud: 'Willful neglect / fraud case',
+  microSmallClassification: 'Micro/small classification',
+}
+
+function friendlyLabel(key) {
+  if (FRIENDLY_LABELS[key]) return FRIENDLY_LABELS[key]
   const spaced = String(key).replace(/_/g, ' ').replace(/([a-z0-9])([A-Z])/g, '$1 $2')
   return spaced.charAt(0).toUpperCase() + spaced.slice(1)
 }
@@ -192,5 +291,50 @@ function formatValue(key, value) {
     if (/rate|percent|ratio/i.test(key)) return formatPercent(value)
     return formatPHP(value)
   }
+  if (/^date$/i.test(key) || /deadline/i.test(key)) {
+    const parsed = new Date(value)
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed.toLocaleDateString('en-PH', { month: 'long', day: 'numeric', year: 'numeric' })
+    }
+  }
   return String(value)
+}
+
+/** The Dashboard snapshot carries its advisor output — show the moves that
+ * were on the table that day, biggest peso impact first (already sorted). */
+function ActionPlanList({ actions }) {
+  if (!Array.isArray(actions) || actions.length === 0) return null
+  return (
+    <div className="history-extra">
+      <div className="history-extra-heading">Advisor actions at save time</div>
+      <ol className="history-action-list">
+        {actions.map((a, i) => (
+          <li key={i}>
+            {a?.title}
+            {typeof a?.impact === 'number' && a.impact > 0 ? (
+              <span className="history-action-impact"> saves ≈{formatPHP(a.impact)}</span>
+            ) : null}
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
+function LedgerList({ ledger }) {
+  if (!Array.isArray(ledger) || ledger.length === 0) return null
+  const total = ledger.reduce((sum, e) => sum + (Number(e?.amount) || 0), 0)
+  return (
+    <div className="history-extra">
+      <div className="history-extra-heading">Write-off ledger ({ledger.length} item{ledger.length === 1 ? '' : 's'} — {formatPHP(total)})</div>
+      <ul className="history-ledger-list">
+        {ledger.map((e, i) => (
+          <li key={i}>
+            <span>{e?.label}</span>
+            <span>{formatPHP(e?.amount)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
 }

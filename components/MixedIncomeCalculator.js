@@ -55,6 +55,20 @@ export default function MixedIncomeCalculator() {
           <label htmlFor="mixed-expenses">Itemized business expenses, if any (₱)</label>
           <input id="mixed-expenses" type="number" inputMode="decimal" placeholder="e.g. 80000" value={expensesInput} onChange={(e) => setExpensesInput(e.target.value)} />
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Mixed Income Tax"
+          summary={hasIncome ? `Total tax ${formatPHP(result.totalTax)} (comp ${formatPHP(grossCompensation)} + business ${formatPHP(grossReceipts)})` : ''}
+          details={{
+            grossCompensation,
+            grossReceipts,
+            itemizedExpenses,
+            taxOnCompensation: result?.employee?.total,
+            taxOnBusiness: result?.business?.best?.total,
+            totalTax: result?.totalTax,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <ErrorFlags errors={errors} />
@@ -65,23 +79,6 @@ export default function MixedIncomeCalculator() {
         <StatTile label="Total Tax" value={hasIncome ? formatPHP(result.totalTax) : '—'} />
         <StatTile label="Effective Rate" value={hasIncome ? formatPercent(effectiveRate) : '—'} />
       </div>
-
-      {hasIncome && (
-        <div style={{ marginBottom: 20 }}>
-          <SaveToHistoryButton
-            calculatorName="Mixed Income Tax"
-            summary={`Total tax ${formatPHP(result.totalTax)} (comp ${formatPHP(grossCompensation)} + business ${formatPHP(grossReceipts)})`}
-            details={{
-              grossCompensation,
-              grossReceipts,
-              itemizedExpenses,
-              taxOnCompensation: result.employee.total,
-              taxOnBusiness: result.business.best.total,
-              totalTax: result.totalTax,
-            }}
-          />
-        </div>
-      )}
 
       {hasIncome && (
         <section className="card">

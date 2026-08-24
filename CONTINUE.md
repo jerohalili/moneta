@@ -62,6 +62,13 @@ The person approved the stack: **Vercel (deploy) + Neon (Postgres) + Better Auth
 - **`/login` redesigned** as a centered welcome screen (`.auth-shell/.auth-box/.auth-brand`): Google + guest as equal primary buttons, email form below a divider. Guest copy explains it's instant and links into a real account later.
 - **History rebuilt**: filter chips per calculator name, expandable rows revealing the full saved `details` figure set (money keys via formatPHP, `*rate*` keys via formatPercent, primitives only), Export JSON, cloud-synced disclaimer. The details data was always stored — this page finally surfaces it.
 
+### Follow-up 2: save buttons everywhere + History readability
+
+- **Every calculator now has Save-to-History** inside its input card (full-width green CTA, disabled until inputs exist): Net Pay, Contributions, 13th Month, Overtime, Variable Income, Sole-vs-Corp, Corporate, BMBE, EWT, Penalties, Closure Penalty, Percentage Tax + VAT modes, and all five Property modes. Dashboard: single button at the end of the active income-input card (business card for freelancer/business/mixed; compensation card for pure employees) — NOT the profile picker.
+- **Dashboard snapshots now carry** grossIncome/businessRoute/actionPlan(top-5 with impacts)/ledger(≤50). HistoryList has a FRIENDLY_LABELS map (~80 keys → plain English), drops null values entirely, renders actionPlan as "Advisor actions at save time" list and ledger as a mini table.
+- Overtime crash fix: `result.multiplier` (was `result.category.multiplier`, removed during live-rates refactor).
+- Rates & Logic link lives ONLY in the account dropdown now (nav decluttered); /settings route unchanged.
+
 ### Setup checklist (the person's part — code won't run against a DB until done)
 
 1. **Neon**: Vercel project → Storage → create Neon Postgres → copy `DATABASE_URL` into local `.env.local` AND Vercel env vars.

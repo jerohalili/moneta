@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { computeEwt, EWT_CATEGORIES } from '@/lib/ewt'
 import { formatPHP } from '@/lib/format'
 import StatTile from './StatTile'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 const NEEDS_PAYEE_INCOME = ['professional-individual', 'professional-corporate']
 
@@ -48,11 +49,29 @@ export default function EwtCalculator() {
           <div className="field">
             <label htmlFor="ewt-payee-income">Payee&apos;s annual gross income (₱)</label>
             <input id="ewt-payee-income" type="number" inputMode="decimal" placeholder="e.g. 2000000" value={payeeIncomeInput} onChange={(e) => setPayeeIncomeInput(e.target.value)} />
-            <p className="disclaimer" style={{ marginTop: 8 }}>
+            <p className="disclaimer" style={{ marginTop: 8, borderTop: 'none', paddingTop: 0 }}>
               The lower rate requires a sworn declaration on file from the payee confirming this figure.
             </p>
           </div>
         )}
+
+        <SaveToHistoryButton
+          calculatorName="Expanded Withholding Tax"
+          summary={
+            hasIncome
+              ? `${formatPHP(result.withheld)} withheld (${(result.rate * 100).toFixed(0)}%) of ${formatPHP(grossAmount)}`
+              : ''
+          }
+          details={{
+            category: EWT_CATEGORIES.find((c) => c.id === category)?.label ?? category,
+            grossAmount,
+            payeeAnnualIncome: needsPayeeIncome ? payeeAnnualIncome : null,
+            rateApplied: result?.rate,
+            taxWithheld: result?.withheld,
+            netPayment: result?.netPayment,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="stat-grid">

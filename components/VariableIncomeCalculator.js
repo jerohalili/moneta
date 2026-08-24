@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { computeVariableIncomeTax } from '@/lib/variableIncome'
 import { formatPHP } from '@/lib/format'
 import StatTile from './StatTile'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 export default function VariableIncomeCalculator() {
   const [periods, setPeriods] = useState([])
@@ -88,6 +89,25 @@ export default function VariableIncomeCalculator() {
             makes the picture complete.
           </p>
         )}
+
+        <SaveToHistoryButton
+          calculatorName="Variable Income"
+          summary={
+            hasPeriods
+              ? `${formatPHP(result.incomeTax)} tax across ${periods.length} period${periods.length === 1 ? '' : 's'} (${monthsCovered} mo)`
+              : ''
+          }
+          details={{
+            periodsCount: periods.length,
+            monthsCovered,
+            totalBasicSalary: result?.totalBasicSalary,
+            totalContributions: result?.totalContributions,
+            taxableCompensation: result?.taxableCompensation,
+            thirteenthMonthPay: result?.thirteenthMonth?.thirteenthMonthPay,
+            incomeTax: result?.incomeTax,
+          }}
+          disabled={!hasPeriods}
+        />
       </section>
 
       <div className="stat-grid">

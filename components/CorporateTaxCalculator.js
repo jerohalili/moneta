@@ -5,6 +5,7 @@ import { computeCorporateTax } from '@/lib/corporateTax'
 import { formatPHP } from '@/lib/format'
 import { RATES } from '@/lib/taxConfig'
 import StatTile from './StatTile'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 export default function CorporateTaxCalculator() {
   const [grossIncomeInput, setGrossIncomeInput] = useState('')
@@ -43,6 +44,24 @@ export default function CorporateTaxCalculator() {
           <label htmlFor="corp-years">Years in operation</label>
           <input id="corp-years" type="number" inputMode="decimal" placeholder="e.g. 5" value={yearsInput} onChange={(e) => setYearsInput(e.target.value)} />
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Corporate Income Tax"
+          summary={hasIncome ? `${formatPHP(result.tax)} due at ${(result.rcitRate * 100).toFixed(0)}% RCIT${result.usedMcit ? ' (MCIT higher)' : ''}` : ''}
+          details={{
+            grossIncome,
+            netTaxableIncome,
+            totalAssets,
+            yearsInOperation,
+            qualifiesSmall: result?.qualifiesSmall,
+            rcitRate: result?.rcitRate,
+            rcit: result?.rcit,
+            mcit: result?.mcitApplies ? result.mcit : null,
+            usedMcit: result?.usedMcit,
+            taxDue: result?.tax,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="stat-grid">

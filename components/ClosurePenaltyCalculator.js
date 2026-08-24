@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { computeClosurePenalty } from '@/lib/closurePenalty'
 import { formatPHP } from '@/lib/format'
 import StatTile from './StatTile'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 export default function ClosurePenaltyCalculator() {
   const [countInput, setCountInput] = useState('')
@@ -21,12 +22,23 @@ export default function ClosurePenaltyCalculator() {
         <div className="field">
           <label htmlFor="unfiled-count">Number of unfiled returns since you stopped operating</label>
           <input id="unfiled-count" type="number" inputMode="decimal" placeholder="e.g. 18" value={countInput} onChange={(e) => setCountInput(e.target.value)} />
-          <p className="disclaimer" style={{ marginTop: 8 }}>
+          <p className="disclaimer" style={{ marginTop: 8, borderTop: 'none', paddingTop: 0 }}>
             Count every monthly/quarterly percentage tax, VAT, and withholding return, plus annual ITRs, that came
             due after you stopped but before you filed a formal closure with BIR. If you&apos;re not sure, check
             your Certificate of Registration for which forms you were required to file.
           </p>
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Closure Penalty"
+          summary={hasIncome ? `${count} unfiled returns — est. ${formatPHP(result.estimatedTotal)}` : ''}
+          details={{
+            unfiledReturnsCount: count,
+            minimumCompromisePerReturn: result?.perReturnMinimum,
+            estimatedTotal: result?.estimatedTotal,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="stat-grid">

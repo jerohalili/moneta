@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { computeNetPay } from '@/lib/netPay'
 import { formatPHP, formatPercent } from '@/lib/format'
 import StatTile from './StatTile'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 export default function NetPayCalculator() {
   const [monthlyInput, setMonthlyInput] = useState('')
@@ -30,6 +31,19 @@ export default function NetPayCalculator() {
             onChange={(e) => setMonthlyInput(e.target.value)}
           />
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Net Pay"
+          summary={hasIncome ? `₱${Math.round(result.netPay).toLocaleString()} net of ₱${Math.round(monthly).toLocaleString()} gross` : ''}
+          details={{
+            monthlyGross: monthly,
+            contributions: result?.contributions?.totalEmployee,
+            monthlyWithholdingTax: result?.monthlyWithholdingTax,
+            netPay: result?.netPay,
+            takeHomeRate,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="stat-grid">

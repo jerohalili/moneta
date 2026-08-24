@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { computeOvertimePay, OT_CATEGORIES } from '@/lib/overtimePay'
 import { formatPHP } from '@/lib/format'
 import StatTile from './StatTile'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 export default function OvertimeCalculator() {
   const [rateInput, setRateInput] = useState('')
@@ -51,10 +52,30 @@ export default function OvertimeCalculator() {
           <label htmlFor="ot-night">Of those, hours between 10PM–6AM (night differential)</label>
           <input id="ot-night" type="number" inputMode="decimal" placeholder="e.g. 2" value={nightDiffInput} onChange={(e) => setNightDiffInput(e.target.value)} />
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Overtime Pay"
+          summary={
+            hasIncome
+              ? `${formatPHP(result.total)} — ${OT_CATEGORIES.find((c) => c.id === categoryId)?.label ?? categoryId}`
+              : ''
+          }
+          details={{
+            workType: OT_CATEGORIES.find((c) => c.id === categoryId)?.label ?? categoryId,
+            hourlyRate,
+            hoursWorked: hours,
+            nightDiffHours,
+            multiplierApplied: result?.multiplier,
+            basePay: result?.basePay,
+            nightDiffPay: result?.nightDiffPay,
+            totalPay: result?.total,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="stat-grid">
-        <StatTile label="Multiplier" value={hasIncome ? `${result.category.multiplier.toFixed(2)}×` : '—'} />
+        <StatTile label="Multiplier" value={hasIncome ? `${result.multiplier.toFixed(2)}×` : '—'} />
         <StatTile label="Base Pay" value={hasIncome ? formatPHP(result.basePay) : '—'} />
         <StatTile label="Night Differential" value={hasIncome ? formatPHP(result.nightDiffPay) : '—'} />
         <StatTile label="Total" value={hasIncome ? formatPHP(result.total) : '—'} />

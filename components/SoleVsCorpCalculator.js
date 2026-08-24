@@ -5,6 +5,7 @@ import { compareRoutes } from '@/lib/freelancerTax'
 import { computeCorporateTax } from '@/lib/corporateTax'
 import { formatPHP } from '@/lib/format'
 import StatTile from './StatTile'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 export default function SoleVsCorpCalculator() {
   const [grossInput, setGrossInput] = useState('')
@@ -49,6 +50,26 @@ export default function SoleVsCorpCalculator() {
           <label htmlFor="svc-years">If incorporated: years in operation</label>
           <input id="svc-years" type="number" inputMode="decimal" value={yearsInput} onChange={(e) => setYearsInput(e.target.value)} />
         </div>
+
+        <SaveToHistoryButton
+          calculatorName="Sole Prop vs Corporation"
+          summary={
+            hasIncome
+              ? `${cheaper === 'corp' ? 'Corporation' : 'Sole prop'} cheaper — ${formatPHP(Math.min(soleProp.best.total, corp.tax))} vs ${formatPHP(Math.max(soleProp.best.total, corp.tax))}`
+              : ''
+          }
+          details={{
+            grossIncome: gross,
+            deductibleExpenses: expenses,
+            corporateTotalAssets: assets,
+            yearsInOperation: years,
+            solePropBestRoute: soleProp?.best?.method,
+            solePropTax: soleProp?.best?.total,
+            corporationTax: corp?.tax,
+            cheaperOption: cheaper === 'corp' ? 'Corporation' : cheaper === 'sole' ? 'Sole proprietorship' : null,
+          }}
+          disabled={!hasIncome}
+        />
       </section>
 
       <div className="route-comparison">
