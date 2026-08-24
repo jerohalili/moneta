@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { computeCorporateTax } from '@/lib/corporateTax'
 import { formatPHP } from '@/lib/format'
-import { CORPORATE_SMALL_INCOME_CEILING, CORPORATE_SMALL_ASSET_CEILING } from '@/data/taxRates2026'
+import { RATES } from '@/lib/taxConfig'
 import StatTile from './StatTile'
 
 export default function CorporateTaxCalculator() {
@@ -67,8 +67,8 @@ export default function CorporateTaxCalculator() {
         <p className="empty-copy">
           Under the CREATE Act (RA 11534), the corporation pays whichever is higher of Regular Corporate Income Tax
           (RCIT) or Minimum Corporate Income Tax (MCIT). RCIT is 20% if net taxable income doesn&apos;t exceed{' '}
-          {formatPHP(CORPORATE_SMALL_INCOME_CEILING)} AND total assets (excluding land) don&apos;t exceed{' '}
-          {formatPHP(CORPORATE_SMALL_ASSET_CEILING)} — otherwise 25%. MCIT is 2% of gross income, and only applies
+          {formatPHP(RATES.CORPORATE_SMALL_INCOME_CEILING)} AND total assets (excluding land) don&apos;t exceed{' '}
+          {formatPHP(RATES.CORPORATE_SMALL_ASSET_CEILING)} — otherwise 25%. MCIT is 2% of gross income, and only applies
           starting the 4th taxable year of operations.
         </p>
         <p className="disclaimer" style={{ marginTop: 12 }}>

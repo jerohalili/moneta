@@ -1,7 +1,6 @@
 'use client'
 
 import { formatPHP } from '@/lib/format'
-import { EIGHT_PERCENT_EXEMPTION } from '@/data/taxRates2026'
 
 const METHOD_LABELS = {
   'graduated-osd': 'Graduated rate + Optional Standard Deduction',
@@ -27,7 +26,7 @@ export default function RouteComparison({ comparison }) {
                 <dt>Deduction</dt>
                 <dd>
                   {route.method === '8-percent'
-                    ? formatPHP(EIGHT_PERCENT_EXEMPTION) + ' exemption'
+                    ? formatPHP(route.exemptionApplied) + ' exemption'
                     : formatPHP(route.deduction)}
                 </dd>
               </div>

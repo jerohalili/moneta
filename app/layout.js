@@ -1,5 +1,6 @@
 import { Fraunces, IBM_Plex_Mono, Inter } from 'next/font/google'
 import AppNav from '@/components/AppNav'
+import TaxConfigSync from '@/components/TaxConfigSync'
 import './globals.css'
 
 const fraunces = Fraunces({
@@ -45,6 +46,7 @@ export default function RootLayout({ children }) {
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body suppressHydrationWarning>
+        <TaxConfigSync />
         <div className="app-shell">
           <AppNav />
           <main className="container">{children}</main>

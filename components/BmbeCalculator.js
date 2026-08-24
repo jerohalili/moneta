@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { computeBmbeSavings } from '@/lib/bmbe'
 import { formatPHP } from '@/lib/format'
-import { BMBE_ASSET_CEILING } from '@/data/taxRates2026'
+import { RATES } from '@/lib/taxConfig'
 import StatTile from './StatTile'
 
 export default function BmbeCalculator() {
@@ -51,8 +51,8 @@ export default function BmbeCalculator() {
           >
             <span className="error-flag-icon" aria-hidden="true">{result.eligible ? '✓' : '⚠'}</span>
             {result.eligible
-              ? `Eligible — your assets are under the ${formatPHP(BMBE_ASSET_CEILING)} ceiling.`
-              : `Not eligible — your assets exceed the ${formatPHP(BMBE_ASSET_CEILING)} ceiling.`}
+              ? `Eligible — your assets are under the ${formatPHP(RATES.BMBE_ASSET_CEILING)} ceiling.`
+              : `Not eligible — your assets exceed the ${formatPHP(RATES.BMBE_ASSET_CEILING)} ceiling.`}
           </div>
         </div>
       )}
@@ -67,7 +67,7 @@ export default function BmbeCalculator() {
         <h2>How this is computed</h2>
         <p className="empty-copy">
           A Barangay Micro Business Enterprise (RA 9178) with total assets — excluding land — not exceeding{' '}
-          {formatPHP(BMBE_ASSET_CEILING)} is 100% exempt from income tax on income from its operations (NIRC Sec.
+          {formatPHP(RATES.BMBE_ASSET_CEILING)} is 100% exempt from income tax on income from its operations (NIRC Sec.
           27(D)). This isn&apos;t automatic: you need a BMBE Certificate of Authority from DTI (sole
           proprietorships) or your city/municipal office (partnerships, corporations, cooperatives), registered
           with your RDO.

@@ -6,11 +6,12 @@ import { computeEmployeeTax } from '@/lib/employeeTax'
 import { computeMonthlyContributions } from '@/lib/contributions'
 import { computeNetPay } from '@/lib/netPay'
 import { computeThirteenthMonthPay } from '@/lib/thirteenthMonthPay'
-import { getFreelancerTips } from '@/lib/advisor'
+import { buildAdvicePlan } from '@/lib/advisor'
 import { EXPENSE_CATEGORIES } from '@/lib/expenseCategories'
 import { formatPHP } from '@/lib/format'
 import { loadJSON, saveJSON } from '@/lib/localStore'
-import { VAT_THRESHOLD } from '@/data/taxRates2026'
+import { RATES } from '@/lib/taxConfig'
+import useTaxRatesVersion from './useTaxRatesVersion'
 
 export const PROFILE_TYPES = [
   { id: 'employee', label: 'Employee', description: 'Compensation income, one employer.' },
@@ -53,6 +54,8 @@ export function useIncomeProfile() {
   const [contributionsOverride, setContributionsOverride] = useState('')
   const [useContributionsOverride, setUseContributionsOverride] = useState(false)
   const [grossReceiptsInput, setGrossReceiptsInput] = useState('')
+  const [totalAssetsInput, setTotalAssetsInput] = useState('')
+  const [vatRegistered, setVatRegistered] = useState(false)
   const [ledger, setLedger] = useState([])
   const [draft, setDraft] = useState({
     label: '',
@@ -74,6 +77,8 @@ export function useIncomeProfile() {
       setContributionsOverride(saved.contributionsOverride ?? '')
       setUseContributionsOverride(saved.useContributionsOverride ?? false)
       setGrossReceiptsInput(saved.grossReceiptsInput ?? '')
+      setTotalAssetsInput(saved.totalAssetsInput ?? '')
+      setVatRegistered(saved.vatRegistered ?? false)
       setLedger(saved.ledger ?? [])
     }
     setHydrated(true)
@@ -91,23 +96,37 @@ export function useIncomeProfile() {
       contributionsOverride,
       useContributionsOverride,
       grossReceiptsInput,
+      totalAssetsInput,
+      vatRegistered,
       ledger,
     })
-  }, [hydrated, profileType, grossCompensationInput, contributionsOverride, useContributionsOverride, grossReceiptsInput, ledger])
+  }, [hydrated, profileType, grossCompensationInput, contributionsOverride, useContributionsOverride, grossReceiptsInput, totalAssetsInput, vatRegistered, ledger])
 
   const needsEmployeeFields = profileType === 'employee' || profileType === 'mixed'
   const needsBusinessFields = profileType === 'freelancer' || profileType === 'business' || profileType === 'mixed'
   const isMixed = profileType === 'mixed'
 
+  // Bumps whenever rates are edited on /settings — included in every
+  // memo dependency below so the whole snapshot recomputes live.
+  const ratesVersion = useTaxRatesVersion()
+
+  // null (not 0) when the field is blank: "unknown" must not read as
+  // "definitely has no assets" for BMBE eligibility.
+  const totalAssets = totalAssetsInput.trim() === ''
+    ? null
+    : Math.max(0, Number(totalAssetsInput) || 0)
+
   const grossCompensation = Math.max(0, Number(grossCompensationInput) || 0)
   const grossReceipts = Math.max(0, Number(grossReceiptsInput) || 0)
 
   const autoContributions = useMemo(
-    () =>
-      needsEmployeeFields && grossCompensation > 0
+    () => {
+      void ratesVersion // cache-bust when rates are edited on /settings
+      return needsEmployeeFields && grossCompensation > 0
         ? computeMonthlyContributions({ monthlyCompensation: grossCompensation / 12 })
-        : null,
-    [needsEmployeeFields, grossCompensation]
+        : null
+    },
+    [needsEmployeeFields, grossCompensation, ratesVersion]
   )
   const autoAnnualContributions = autoContributions ? autoContributions.totalEmployee * 12 : 0
   const mandatoryContributions =
@@ -125,33 +144,71 @@ export function useIncomeProfile() {
   const hasAnyIncome = hasEmployeeIncome || hasBusinessIncome
 
   const employeeResult = useMemo(
-    () => (hasEmployeeIncome ? computeEmployeeTax({ grossCompensation, mandatoryContributions }) : null),
-    [hasEmployeeIncome, grossCompensation, mandatoryContributions]
+    () => {
+      void ratesVersion
+      return hasEmployeeIncome ? computeEmployeeTax({ grossCompensation, mandatoryContributions }) : null
+    },
+    [hasEmployeeIncome, grossCompensation, mandatoryContributions, ratesVersion]
   )
 
   // Auto-orchestration: Net Pay and 13th Month Pay run automatically off
   // the same compensation figure, rather than requiring a separate visit
   // to each calculator page.
   const netPayResult = useMemo(
-    () => (hasEmployeeIncome ? computeNetPay({ monthlyGrossCompensation: grossCompensation / 12 }) : null),
-    [hasEmployeeIncome, grossCompensation]
+    () => {
+      void ratesVersion
+      return hasEmployeeIncome ? computeNetPay({ monthlyGrossCompensation: grossCompensation / 12 }) : null
+    },
+    [hasEmployeeIncome, grossCompensation, ratesVersion]
   )
   const thirteenthMonthResult = useMemo(
-    () => (hasEmployeeIncome ? computeThirteenthMonthPay({ totalBasicSalary: grossCompensation }) : null),
-    [hasEmployeeIncome, grossCompensation]
+    () => {
+      void ratesVersion
+      return hasEmployeeIncome ? computeThirteenthMonthPay({ totalBasicSalary: grossCompensation }) : null
+    },
+    [hasEmployeeIncome, grossCompensation, ratesVersion]
   )
 
   const businessComparison = useMemo(
-    () =>
-      hasBusinessIncome
+    () => {
+      void ratesVersion
+      return hasBusinessIncome
         ? compareRoutes({ grossReceipts, itemizedExpenses, isMixedIncomeEarner: isMixed })
-        : null,
-    [hasBusinessIncome, grossReceipts, itemizedExpenses, isMixed]
+        : null
+    },
+    [hasBusinessIncome, grossReceipts, itemizedExpenses, isMixed, ratesVersion]
   )
 
-  const tips = useMemo(
-    () => (businessComparison ? getFreelancerTips({ grossReceipts, itemizedExpenses, comparison: businessComparison }) : []),
-    [businessComparison, grossReceipts, itemizedExpenses]
+  // The advisor engine: ranked peso-valued actions + line-by-line
+  // explanations of how every tax was computed. This replaces the old
+  // static "Recommendations" tips list.
+  const advicePlan = useMemo(
+    () => {
+      void ratesVersion
+      return hasAnyIncome
+        ? buildAdvicePlan({
+            profileType,
+            grossCompensation,
+            grossReceipts,
+            itemizedExpenses,
+            mandatoryContributions,
+            totalAssets,
+            vatRegistered,
+            hasEmployeeIncome,
+            hasBusinessIncome,
+            isMixed,
+            employeeResult,
+            comparison: businessComparison,
+            thirteenthMonthResult,
+          })
+        : null
+    },
+    [
+      hasAnyIncome, profileType, grossCompensation, grossReceipts, itemizedExpenses,
+      mandatoryContributions, totalAssets, vatRegistered, hasEmployeeIncome,
+      hasBusinessIncome, isMixed, employeeResult, businessComparison, thirteenthMonthResult,
+      ratesVersion,
+    ]
   )
 
   const categoryTotals = useMemo(() => {
@@ -204,7 +261,7 @@ export function useIncomeProfile() {
   // registration itself is now mandatory, not just "the 8% option is
   // gone." grossReceipts here is the entered figure, not a run-rate
   // projection — this only fires once the actual number crosses the line.
-  const exceedsVatThreshold = hasBusinessIncome && grossReceipts > VAT_THRESHOLD
+  const exceedsVatThreshold = hasBusinessIncome && grossReceipts > RATES.VAT_THRESHOLD
 
   function addEntry() {
     const amount = Number(draft.amount)
@@ -240,6 +297,11 @@ export function useIncomeProfile() {
     mandatoryContributions,
     grossReceiptsInput,
     setGrossReceiptsInput,
+    totalAssetsInput,
+    setTotalAssetsInput,
+    vatRegistered,
+    setVatRegistered,
+    totalAssets,
     ledger,
     draft,
     setDraft,
@@ -255,7 +317,7 @@ export function useIncomeProfile() {
     netPayResult,
     thirteenthMonthResult,
     businessComparison,
-    tips,
+    advicePlan,
     categoryTotals,
     errors,
     grossIncome,

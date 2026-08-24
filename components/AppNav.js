@@ -8,6 +8,7 @@ const LINKS = [
   { href: '/', label: 'Dashboard' },
   { href: '/calculators', label: 'Calculators' },
   { href: '/history', label: 'History' },
+  { href: '/settings', label: 'Rates & Logic' },
 ]
 
 export default function AppNav() {

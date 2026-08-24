@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { computePercentageTax, computeVat } from '@/lib/percentageTax'
 import { formatPHP } from '@/lib/format'
-import { VAT_THRESHOLD, VAT_RATE, PERCENTAGE_TAX_RATE } from '@/data/taxRates2026'
+import { RATES } from '@/lib/taxConfig'
 import StatTile from './StatTile'
 
 const MODES = [
@@ -59,21 +59,21 @@ function PercentageMode() {
         <div className="error-flags">
           <div className="error-flag">
             <span className="error-flag-icon" aria-hidden="true">⚠</span>
-            Gross sales/receipts above {formatPHP(VAT_THRESHOLD)} require VAT registration — percentage tax no
+            Gross sales/receipts above {formatPHP(RATES.VAT_THRESHOLD)} require VAT registration — percentage tax no
             longer applies. Switch to the VAT mode above.
           </div>
         </div>
       )}
 
       <div className="stat-grid">
-        <StatTile label={`Percentage Tax (${PERCENTAGE_TAX_RATE * 100}%)`} value={hasIncome && !result.requiresVat ? formatPHP(result.tax) : '—'} />
-        <StatTile label="VAT Threshold" value={formatPHP(VAT_THRESHOLD)} />
+        <StatTile label={`Percentage Tax (${RATES.PERCENTAGE_TAX_RATE * 100}%)`} value={hasIncome && !result.requiresVat ? formatPHP(result.tax) : '—'} />
+        <StatTile label="VAT Threshold" value={formatPHP(RATES.VAT_THRESHOLD)} />
       </div>
 
       <section className="card">
         <h2>How this is computed</h2>
         <p className="empty-copy">
-          A non-VAT-registered business that did not elect the 8% flat-tax option pays {PERCENTAGE_TAX_RATE * 100}%
+          A non-VAT-registered business that did not elect the 8% flat-tax option pays {RATES.PERCENTAGE_TAX_RATE * 100}%
           percentage tax on gross sales/receipts (NIRC Sec. 116), filed quarterly via BIR Form 2551Q.
         </p>
         <p className="disclaimer" style={{ marginTop: 12 }}>
@@ -108,8 +108,8 @@ function VatMode() {
       </section>
 
       <div className="stat-grid">
-        <StatTile label={`Output VAT (${VAT_RATE * 100}%)`} value={hasIncome ? formatPHP(result.outputVat) : '—'} />
-        <StatTile label={`Input VAT (${VAT_RATE * 100}%)`} value={hasIncome ? formatPHP(result.inputVat) : '—'} />
+        <StatTile label={`Output VAT (${RATES.VAT_RATE * 100}%)`} value={hasIncome ? formatPHP(result.outputVat) : '—'} />
+        <StatTile label={`Input VAT (${RATES.VAT_RATE * 100}%)`} value={hasIncome ? formatPHP(result.inputVat) : '—'} />
         <StatTile label="VAT Payable" value={hasIncome ? formatPHP(result.vatPayable) : '—'} />
         <StatTile label="Excess Input VAT (carryover)" value={hasIncome ? formatPHP(result.excessInputVat) : '—'} />
       </div>

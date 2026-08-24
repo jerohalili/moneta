@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { computeCapitalGainsTax, computeDocumentaryStampTax, computeEstateTax, computeDonorsTax } from '@/lib/propertyTax'
 import { computeRealPropertyTax } from '@/lib/realPropertyTax'
 import { formatPHP } from '@/lib/format'
-import { DST_LOAN_RATE_PER_200, DST_LEASE_RATE_FIRST_2000, DST_LEASE_RATE_PER_1000_EXCESS } from '@/data/taxRates2026'
+import { RATES } from '@/lib/taxConfig'
 import StatTile from './StatTile'
 
 const MODES = [
@@ -284,10 +284,10 @@ function OtherDstMode() {
   let tax = null
   if (hasIncome) {
     if (instrumentType === 'loan') {
-      tax = Math.ceil(amount / 200) * DST_LOAN_RATE_PER_200
+      tax = Math.ceil(amount / 200) * RATES.DST_LOAN_RATE_PER_200
     } else {
       const excess = Math.max(0, amount - 2000)
-      tax = DST_LEASE_RATE_FIRST_2000 + Math.ceil(excess / 1000) * DST_LEASE_RATE_PER_1000_EXCESS
+      tax = RATES.DST_LEASE_RATE_FIRST_2000 + Math.ceil(excess / 1000) * RATES.DST_LEASE_RATE_PER_1000_EXCESS
     }
   }
 

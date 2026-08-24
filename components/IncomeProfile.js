@@ -3,13 +3,14 @@
 import Link from 'next/link'
 import { useIncomeProfile } from '@/hooks/useIncomeProfile'
 import { formatPHP, formatPercent } from '@/lib/format'
-import { VAT_THRESHOLD } from '@/data/taxRates2026'
+import { RATES } from '@/lib/taxConfig'
 import ProfileTypeSelector from './ProfileTypeSelector'
 import StatTile from './StatTile'
 import FilingCountdown from './FilingCountdown'
 import ExpenseLedger from './ExpenseLedger'
 import CategoryBars from './CategoryBars'
-import TipsList from './TipsList'
+import AdvisorPlan from './AdvisorPlan'
+import TaxWalkthrough from './TaxWalkthrough'
 import ErrorFlags from './ErrorFlags'
 import SaveToHistoryButton from './SaveToHistoryButton'
 
@@ -35,15 +36,15 @@ export default function IncomeProfile() {
       <section className="card glow-card">
         <h2>Income Profile</h2>
         <p className="empty-copy" style={{ marginBottom: 18 }}>
-          Choose the profile that matches how you earn. Numbers below recalculate live as you type, and your
-          profile is saved in this browser so it&apos;s still here next time — use &ldquo;Save to History&rdquo;
-          below to keep a dated snapshot of a specific result you want to come back to later.
+          Tell the advisor how you earn. Everything below is computed automatically from your answers —
+          what you owe, when it&apos;s due, and a ranked plan of legal moves that lower it. Your profile
+          stays saved in this browser.
         </p>
         <ProfileTypeSelector value={p.profileType} onChange={p.setProfileType} />
       </section>
 
       {p.profileType === null && (
-        <p className="empty-copy">Pick a profile above to see your tax snapshot.</p>
+        <p className="empty-copy">Pick a profile above and the advisor takes over from there.</p>
       )}
 
       {p.needsEmployeeFields && (
@@ -92,7 +93,7 @@ export default function IncomeProfile() {
 
           <p className="disclaimer">
             Contributions are computed automatically from your annual compensation (assuming even monthly pay) using
-            current 2026 SSS/PhilHealth/Pag-IBIG rates — see the Contributions calculator for the full breakdown.
+            current SSS/PhilHealth/Pag-IBIG rates — see the Contributions calculator for the full breakdown.
             Enter regular taxable compensation only — exclude 13th-month pay and other de minimis benefits up to
             ₱90,000, since those are tax-exempt.
           </p>
@@ -113,16 +114,40 @@ export default function IncomeProfile() {
               onChange={(e) => p.setGrossReceiptsInput(e.target.value)}
             />
           </div>
+          <div className="field">
+            <label htmlFor="total-assets">Total business assets, excluding land (₱) — optional</label>
+            <input
+              id="total-assets"
+              type="number"
+              inputMode="decimal"
+              placeholder="e.g. 1200000"
+              value={p.totalAssetsInput}
+              onChange={(e) => p.setTotalAssetsInput(e.target.value)}
+            />
+            <p className="empty-copy" style={{ marginTop: 6 }}>
+              Used to check BMBE eligibility: registered micro businesses under{' '}
+              {formatPHP(RATES.BMBE_ASSET_CEILING)} in assets pay zero income tax. Leave blank if unsure — the
+              advisor just skips that move.
+            </p>
+          </div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+            <input
+              type="checkbox"
+              checked={p.vatRegistered}
+              onChange={(e) => p.setVatRegistered(e.target.checked)}
+            />
+            I&apos;m already VAT-registered
+          </label>
         </section>
       )}
 
       <ErrorFlags errors={p.errors} />
 
-      {p.exceedsVatThreshold && (
+      {p.exceedsVatThreshold && !p.vatRegistered && (
         <div className="error-flags">
           <div className="error-flag" style={{ color: 'var(--accent)', background: 'var(--accent-soft)', borderColor: 'var(--accent)' }}>
             <span className="error-flag-icon" aria-hidden="true">ℹ</span>
-            Your gross receipts/sales are above {formatPHP(VAT_THRESHOLD)} — VAT registration is mandatory, and the
+            Your gross receipts/sales are above {formatPHP(RATES.VAT_THRESHOLD)} — VAT registration is mandatory, and the
             8% flat-tax option is no longer available to you. <Link href="/calculators/business">Use the VAT calculator →</Link>
           </div>
         </div>
@@ -160,12 +185,16 @@ export default function IncomeProfile() {
         </div>
       )}
 
+      <AdvisorPlan plan={p.advicePlan} />
+
+      <TaxWalkthrough walkthroughs={p.advicePlan?.walkthroughs} />
+
       {p.hasEmployeeIncome && (
         <section className="card">
           <h2>Net Pay & 13th Month Pay</h2>
           <p className="empty-copy" style={{ marginBottom: 14 }}>
             Computed automatically from the same compensation figure above &mdash; no separate visit needed to
-            those calculators, though the full versions are linked below if you want more detail.
+            those calculators.
           </p>
           <div className="stat-grid">
             <StatTile label="Monthly Take-Home" value={formatPHP(p.netPayResult.netPay)} />
@@ -234,69 +263,6 @@ export default function IncomeProfile() {
           </section>
         </>
       )}
-
-      {p.hasBusinessIncome && (
-        <section className="card">
-          <h2>Cheapest legal route</h2>
-          <p className="empty-copy">
-            Based on what you&apos;ve entered, the cheapest legal option for your business/professional income is
-            the <strong>{p.businessComparison.best.method.replace('-', ' ')}</strong> route, at{' '}
-            {formatPHP(p.businessComparison.best.total)}.{' '}
-            {(p.profileType === 'freelancer' || p.profileType === 'business') && (
-              <Link href="/calculators/freelancer">Compare all routes side by side →</Link>
-            )}
-            {p.isMixed && (
-              <Link href="/calculators/mixed-income">See the full Mixed Income calculator →</Link>
-            )}
-          </p>
-        </section>
-      )}
-
-      {p.hasBusinessIncome && (
-        <section className="card">
-          <h2>Recommendations</h2>
-          <TipsList tips={p.tips} />
-        </section>
-      )}
-
-      {p.profileType !== null && (
-        <section className="card">
-          <h2>Related calculators</h2>
-          <div className="calc-grid">
-            {relatedCalculators(p.profileType).map((calc) => (
-              <Link href={calc.href} className="calc-tile-link" key={calc.href}>
-                <div className="calc-tile">
-                  <div className="calc-tile-top">
-                    <h3>{calc.name}</h3>
-                  </div>
-                  <p>{calc.description}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
     </>
   )
-}
-
-function relatedCalculators(profileType) {
-  const EMPLOYEE = [
-    { name: 'Employee Income Tax', description: 'A dedicated deep-dive on your withholding tax.', href: '/calculators/employee' },
-    { name: 'Net Pay', description: 'See your full monthly take-home breakdown.', href: '/calculators/net-pay' },
-    { name: '13th Month Pay', description: 'Compute your 13th-month pay and its tax-exempt portion.', href: '/calculators/thirteenth-month' },
-    { name: 'Contributions', description: 'The full SSS/PhilHealth/Pag-IBIG breakdown.', href: '/calculators/contributions' },
-  ]
-  const BUSINESS = [
-    { name: 'Freelancer / Self-Employed Tax', description: 'Compare every route (8% vs. graduated) side by side.', href: '/calculators/freelancer' },
-    { name: 'Business Taxes', description: 'Percentage tax for non-VAT-registered businesses.', href: '/calculators/business' },
-    { name: 'Property & Transfer Taxes', description: 'Selling property or receiving a gift? Compute that here.', href: '/calculators/property' },
-  ]
-  if (profileType === 'employee') return EMPLOYEE
-  if (profileType === 'mixed') return [
-    { name: 'Mixed Income Tax', description: 'The full combined calculator, with the RR 8-2018 rule already applied.', href: '/calculators/mixed-income' },
-    ...EMPLOYEE.slice(1, 2),
-    ...BUSINESS.slice(1),
-  ]
-  return BUSINESS
 }

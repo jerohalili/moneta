@@ -10,63 +10,59 @@ Moneta is a free web tool that computes Philippine (BIR) taxes and flags **legal
 
 - **Next.js 16** (App Router), **React 19**
 - Plain CSS (`app/globals.css`), CSS custom properties, no Tailwind
-- **No account system / no database.** As of this session, there IS a persistence layer, but it's **localStorage only** — see below. Auth + Neon (real cross-device persistence) is still not started.
+- **No account system / no database.** Persistence is **localStorage only** via `lib/localStore.js` — see below. Auth + Neon (real cross-device persistence) is still not started.
 - Deployed on **Vercel**
 
-## This session: fixed 3 real bugs + built the local persistence/history layer the person actually asked for
+## This session: Dashboard became a real advisor + user-editable rates & logic
 
-### Bug 1 — contrast: "Live" pill black-on-dark-green in light mode
-Already fixed and pushed in a prior message this session (`.btn-primary`, `.badge`, `.status-pill.live` all had their light/dark text colors backwards). If that patch didn't make it to GitHub before this one, it's included again here since this patch was generated from the actual current repo state, whatever that turned out to be — no action needed either way, just confirming it's not been silently dropped.
+The person's brief, verbatim intent: the old Dashboard "doesn't really do anything aside from automatically suggest a calculator." It should collect info, compute everything automatically, and act as a genuine advisor that lowers taxes and teaches how they work — plus the user must be able to **edit rates/logic/calculations** so the site adapts when the government or economy changes. Both halves shipped this session; neither is a stub.
 
-### Bug 2 — explanatory text stuck in a narrow column
-`.empty-copy { max-width: 58ch }` was a leftover from an earlier, narrower layout. Every "How this is computed" paragraph, the Write-off Ledger's empty state, and similar text blocks were all capped at ~460px regardless of how wide the actual card was — hence "stuck at half left side." **Fixed: removed the `max-width` from `.empty-copy` entirely.** `.disclaimer` never had this problem. If text ever looks unexpectedly narrow again, check for a stray `max-width` on the class in question before assuming it's a flex/grid layout bug.
+### Part 1 — Editable rates & logic (`/settings`, nav label "Rates & Logic")
+
+- **`lib/taxConfig.js` is the new rate layer.** `data/taxRates2026.js` remains the compiled defaults (unchanged, still verified-Aug-2026 figures). `RATES` is a mutable live copy of the defaults; every lib module and every component that previously imported constants directly now reads `RATES.*`. A localStorage-backed override store (`moneta:rate-overrides`) layers user edits on top. Registry entries carry `unit`, `group`, an educational `description` (the settings UI doubles as documentation), and tables declare `columns`.
+- **Hydration contract:** `RATES` starts identical to defaults so SSR and first client paint agree. `components/TaxConfigSync.js` (rendered once in `app/layout.js`) calls `applyStoredOverrides()` in a mount effect, which mutates `RATES` and notifies subscribers. `hooks/useTaxRatesVersion.js` returns a version counter that increments on every change; both income hooks include it in every `useMemo` dep array with a `void ratesVersion` body reference (that's deliberate cache-busting, not a lint accident). Non-hook calculator pages just read `RATES` at render — SPA navigation remounts them, so they pick up edits on mount.
+- **`/settings` page** (`app/settings/page.js` + `components/SettingsEditor.js`): grouped editors for all ~45 scalars and both bracket tables (graduated income tax, compromise penalties). Scalars commit on blur; tables keep a local working copy and commit on cell blur / add / remove / "Fix cumulative bases" (recomputes the base column from the rates). Per-value revert, reset-all, JSON export/import (import validates keys against the registry and rejects unknown keys loudly rather than silently ignoring).
+- **Gotchas encoded in `taxConfig.js` (do not regress):**
+  - `clone()` spread-copies table rows because a JSON round-trip turns `Infinity` (the open-ended final bracket bound) into `null` — which silently corrupts `explainGraduatedTable`'s slice math.
+  - `sanitizeOverride` accepts `Infinity` for `currency-or-inf` columns; `Number.isFinite(Infinity)` is false, so a naive finite-check rejects every legal bracket table.
+  - `applyStoredOverrides()` must never run during render — same SSR rule as ThemeToggle/useIncomeProfile.
+  - `OT_CATEGORIES` no longer carries multipliers at module scope; `computeOvertimePay` resolves them from `RATES` at call time by id, otherwise OT-rate edits wouldn't take effect.
+
+### Part 2 — Dashboard advisor
+
+- **`lib/advisor.js` gained `buildAdvicePlan(...)`** (the original `getFreelancerTips` is untouched — the Freelancer Workbench still uses it). Given the whole profile context, it returns:
+  - `actions[]` — ranked peso-valued moves: elect-the-8% (vs cheapest graduated total), keep-itemizing (OSD delta), BMBE registration (income-tax share only, gated on known assets ≤ ceiling, !vatRegistered, receipts ≤ VAT threshold, and honest about practice-of-profession exclusion), expense-headroom (₱25k example through the actual bracket math), VAT-threshold proximity/crossed/VAT-already-registered variants, bonus-envelope structuring around the 13th-month exemption (impact = spillover × marginal bracket rate), and file-on-time (a real computed 30-day-late penalty estimate as avoided cost). Sorted impact-desc, nulls last, capped at 7.
+  - `walkthroughs[]` — line-by-line computation explanations per income stream (gross → deductions → taxable → per-bracket slices with the person's real numbers → other taxes → total), powered by new `explainGraduatedTable()` in `lib/freelancerTax.js`.
+- **Dashboard intake expanded:** business profiles now also ask **total assets (optional)** and **already-VAT-registered**, persisted with the rest of the profile. Assets-as-blank means null ("unknown"), never 0 — that distinction drives BMBE gating.
+- **UI changes** (`components/IncomeProfile.js`): new `AdvisorPlan` (ranked action cards with impact badges, tag pills, rule citations, links only where another page adds something) and `TaxWalkthrough` (bracket-slice tables) sit right under the headline stats. The "Related calculators" grid, "Cheapest legal route", and old "Recommendations" cards are GONE — the person explicitly didn't want a calculator router as the dashboard's job. Net Pay/13th-month, filing countdown, quarterly reserve, ledger, categories all kept.
+
+### Verification performed
+
+- `npx eslint .` — zero errors/warnings
+- `npm run build` — clean, 25 routes incl. `/settings`
+- A throwaway Node smoke suite (40 checks, run outside the repo against the real modules via a `@/`-resolution loader hook): bracket boundary math, route comparison totals, mixed-earner exemption suppression, live override→recompute→reset round trips, Infinity survival through clone/reset/import, import validation rejections, advisor plan composition for freelancer/business/employee scenarios, BMBE impact = income-tax-share-only. All green. Recreate it if touching `lib/taxConfig.js` or `lib/advisor.js`.
+
+## Previous sessions (still accurate where not superseded above)
 
 ### Bug 3 — auto-computed contributions producing nonsense for tiny inputs
-Typing something like "100" for annual gross compensation (a testing/placeholder value, or a genuine typo) produced ~₱6,000 in computed contributions and a negative net income. **This wasn't a math bug** — `lib/contributions.js`'s floors are real: SSS has a ₱5,000 minimum Monthly Salary Credit and PhilHealth has a ₱10,000 floor, both of which apply regardless of how low the actual salary is. The problem was that **nothing flagged when this produced a nonsensical result** — the auto-computed path had no sanity check, even though the *manual override* path already had one.
+`hooks/useIncomeProfile.js` errors include the explanatory message when auto-computed contributions exceed gross compensation (SSS ₱5,000 / PhilHealth ₱10,000 floors are real — missing-validation bug, not formula bug).
 
-**Fixed in `hooks/useIncomeProfile.js`:** added an error check — if auto-computed annual contributions exceed the entered gross compensation, `errors` now includes a message explaining *why* (the floors), not just that something's wrong, and suggests double-checking the number or using the manual override. The underlying math in `lib/contributions.js` is untouched, since the floors are accurate — this was a missing-validation bug, not a formula bug. If you touch any other calculator that calls `computeMonthlyContributions` or `computeNetPay` (Net Pay calculator, Mixed Income calculator), the same edge case can occur there too and doesn't yet have the same warning — only the Income Profile hook has it as of this session.
+### Bug 4 (visual)
+Never use `.stat-tile` divs with inline styles stripping card treatment — use `<StatTile>` inside `.stat-grid`.
 
-### Bug 4 (visual) — the "Contributions (computed automatically)" stat looked broken
-`components/IncomeProfile.js` and `components/FreelancerWorkbench.js` both had a recurring anti-pattern: a `.stat-tile` div with `style={{ border: 'none', padding: 0, background: 'transparent' }}` stripping out all the actual `.stat-tile` styling, leaving raw unstyled text stacked with no card treatment — inconsistent with every other stat on the page. **Fixed by using the real `<StatTile>` component inside a proper `.stat-grid` wrapper**, matching everywhere else. Search for that exact inline-style string before adding a new one-off stat display; it should never recur.
+### Local persistence + history
+`lib/localStore.js` (defensive localStorage wrappers), `lib/history.js` + `SaveToHistoryButton` + `HistoryList` (capped-200 log), profile persistence in `useIncomeProfile` under `moneta:income-profile` with hydrate-after-mount gating. Live recalculation was never reverted; explicit save exists alongside it.
 
-## This session: local persistence + history (the actual feature request)
-
-The person's core complaint: "automatic" (live recalculation, no Calculate button) was the right call for *display*, but it removed any discrete moment to *save* a result, and the Income Profile reset on every page refresh. Two different problems, two different fixes — **live recalculation was NOT reverted**; a separate save action was added alongside it.
-
-### `lib/localStore.js` (new)
-Thin, defensive `loadJSON`/`saveJSON`/`removeJSON` wrappers around `window.localStorage`, all try/caught (private browsing, disabled storage, quota — all fail silently rather than crash). This is genuinely the only persistence layer in the app right now. It's per-browser, not synced across devices, and wiped if the person clears site data — say so in the UI wherever it's used, don't let it read as real cloud storage.
-
-### `lib/history.js` (new) + `components/HistoryList.js` (new) + `components/SaveToHistoryButton.js` (new)
-A calculation history log backed by `lib/localStore.js`. `SaveToHistoryButton` is a reusable button (label: "Save to History", not "Calculate" — the distinction matters, see above) that snapshots `{ calculatorName, summary, details, savedAt }` into the log. `app/history/page.js` was rewritten from a static placeholder into a real client component (`HistoryList`) that lists, deletes, and clears saved entries.
-
-**Wired up so far:** Income Profile, Freelancer calculator, Employee calculator, Mixed Income calculator. **Not yet wired up:** the other ~14 calculators (Contributions, Net Pay, 13th Month, Corporate, BMBE, EWT, Overtime, Property/Sale/Estate/Donor/RPT/DST modes, Penalties, Closure Penalty, Sole vs Corp, Business/VAT). If picking this up again, adding `<SaveToHistoryButton />` to the rest is mechanical — copy the pattern from `EmployeeTaxCalculator.js` (simplest example): compute a `summary` string and a `details` object from the calculator's existing state/result, done.
-
-### `hooks/useIncomeProfile.js` — now persists across refresh
-The whole Income Profile (`profileType`, both income figures, the write-off ledger, the contributions override) is loaded from localStorage on mount and saved on every change. This is the "store all the needed info" fix — the profile is now a real, if locally-scoped, saved object, not disposable render state. Follows the same "start with server-safe defaults, hydrate after mount" pattern already used by `ThemeToggle.js`/`FilingCountdown.js` to avoid SSR/hydration mismatches — don't try to read localStorage during initial render.
-
-### Dashboard auto-orchestration — partially addressed
-For Employee/Mixed profiles, `useIncomeProfile` now also runs `computeNetPay()` and `computeThirteenthMonthPay()` automatically off the same stored compensation figure, and `components/IncomeProfile.js` renders those results directly in a new "Net Pay & 13th Month Pay" section — not just a link out to those calculators anymore. Business-side profiles (Freelancer/Business/Mixed) already had this pattern from an earlier session (cheapest-route + tips shown inline). **Not done:** anything beyond these two — e.g. auto-suggesting BMBE eligibility would need a new "business assets" field the Income Profile doesn't currently collect. If asked to go further here, that's the natural next data point to add.
-
-## This session: three more Dashboard improvements
-
-Asked "can the Dashboard be improved further" — reviewed the actual current component and found three concrete, low-effort/high-value gaps:
-
-1. **VAT threshold suggestion.** `hooks/useIncomeProfile.js` now exposes `exceedsVatThreshold` (gross receipts > `VAT_THRESHOLD`, ₱3M — reuses the constant already in `data/taxRates2026.js`, doesn't duplicate it). `compareRoutes()` already silently drops the 8% option once receipts cross this line, but nothing told the person *why* or that VAT registration is now mandatory. `IncomeProfile.js` now shows an explicit info-styled banner with a link to the VAT calculator when this fires.
-2. **Plain-language headline summary.** A one-line sentence now sits above the stat grid — "Freelancer — ₱850,000 gross this year, an effective tax rate of 5.2%, leaving roughly ₱X take-home." Synthesizes the four stat tiles into one readable takeaway instead of requiring the person to piece it together themselves. Needed exposing `grossIncome` from the hook (it was already computed internally, just wasn't returned).
-3. **Recent History preview on the Dashboard itself.** `components/DashboardHistoryPreview.js` (new) reads the same `lib/history.js` log the History page uses and shows the last 4 saved entries directly on the Dashboard, with a link to the full page. Renders nothing if there's no history yet, rather than showing an empty state on every visit. This also let the "Historical Archive" roadmap tile get an honest rename to "Full Historical Archive" — the *local* version now exists; what's still missing is cross-device sync, which needs the account/database layer.
-
-## Verified working
-
-- `npm install && npx eslint .` — clean, zero errors, full project
-- All fixes verified against the actual current GitHub state (cloned fresh, applied, installed, linted) before being called done
+### Verified working
+- `npm install && npx eslint . && npm run build`
 
 ## Suggested next steps
 
-1. Extend Save-to-History to the remaining calculators (mechanical, see above)
-2. Add the same "auto contributions exceed income" sanity check to Net Pay and Mixed Income calculators, not just the Income Profile hook
-3. Auth + Neon — still the big lever; once it exists, `lib/localStore.js`-backed history and profile persistence should migrate to real per-account storage, and the "this is per-browser only" disclaimers throughout the UI can come out
-4. If deepening Dashboard auto-orchestration further, consider what new profile fields would be needed (e.g. business assets → BMBE eligibility) before building the UI for it
+1. Wire Save-to-History into the remaining ~14 calculators (mechanical; pattern in `EmployeeTaxCalculator.js`)
+2. Auth + Neon — then migrate rate overrides AND history/profile off localStorage; `/settings` export/import becomes the sharing story until then
+3. Advisor extensions: quarterly cumulative-form-correct reserve (not even-split); EWT-aware net-receipts view for professionals whose clients withhold
+4. If adding NEW rates, add them to `RATE_REGISTRY` (with unit/description/group) in the same commit — anything absent from the registry can't be edited and silently stays compiled-default
 
 ## How to hand this to a different LLM
 
-Paste this file plus: "continue this project." Pay particular attention to the "automatic ≠ no way to save" distinction above — it's a real design decision this session made explicit, not an oversight to revisit casually.
+Paste this file plus: "continue this project." Pay attention to (a) the hydration contract around `RATES` overrides, (b) the Infinity-in-brackets clone gotcha, and (c) the design decision that the Dashboard advises rather than routes to calculators — all three are deliberate, documented decisions, not oversights to revisit casually.
