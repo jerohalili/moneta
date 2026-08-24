@@ -284,14 +284,22 @@ function friendlyLabel(key) {
   return spaced.charAt(0).toUpperCase() + spaced.slice(1)
 }
 
+const COUNT_KEYS = /hours|count|months|periods/i
+const RATE_KEYS = /rate|percent|ratio/i
+
 function formatValue(key, value) {
   if (value === null || value === undefined || value === '') return '—'
   if (typeof value === 'boolean') return value ? 'Yes' : 'No'
   if (typeof value === 'number') {
-    if (/rate|percent|ratio/i.test(key)) return formatPercent(value)
+    // Order matters: 'hourlyRate' contains "rate" but is pesos; a rate
+    // fraction is always ≤ ~1.5, so anything larger is a money/count value
+    // that merely has rate-ish wording in its key.
+    if (key === 'multiplierApplied') return `${value.toFixed(2)}×`
+    if (RATE_KEYS.test(key) && Math.abs(value) <= 1.5) return formatPercent(value)
+    if (COUNT_KEYS.test(key)) return String(Math.round(value))
     return formatPHP(value)
   }
-  if (/^date$/i.test(key) || /deadline/i.test(key)) {
+  if (/^date$/i.test(key) || /deadline|notarization/i.test(key)) {
     const parsed = new Date(value)
     if (!Number.isNaN(parsed.getTime())) {
       return parsed.toLocaleDateString('en-PH', { month: 'long', day: 'numeric', year: 'numeric' })
@@ -323,18 +331,25 @@ function ActionPlanList({ actions }) {
 
 function LedgerList({ ledger }) {
   if (!Array.isArray(ledger) || ledger.length === 0) return null
+  const PREVIEW_LIMIT = 8
   const total = ledger.reduce((sum, e) => sum + (Number(e?.amount) || 0), 0)
+  const shown = ledger.slice(0, PREVIEW_LIMIT)
   return (
     <div className="history-extra">
-      <div className="history-extra-heading">Write-off ledger ({ledger.length} item{ledger.length === 1 ? '' : 's'} — {formatPHP(total)})</div>
+      <div className="history-extra-heading">
+        Write-off ledger ({ledger.length} item{ledger.length === 1 ? '' : 's'} — {formatPHP(total)})
+      </div>
       <ul className="history-ledger-list">
-        {ledger.map((e, i) => (
+        {shown.map((e, i) => (
           <li key={i}>
             <span>{e?.label}</span>
             <span>{formatPHP(e?.amount)}</span>
           </li>
         ))}
       </ul>
+      {ledger.length > PREVIEW_LIMIT && (
+        <p className="history-ledger-more">+{ledger.length - PREVIEW_LIMIT} more in this snapshot</p>
+      )}
     </div>
   )
 }

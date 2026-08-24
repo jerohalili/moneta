@@ -167,13 +167,28 @@ export default function IncomeProfile() {
             I&apos;m already VAT-registered
           </label>
 
+          {!p.isMixed && (
+            <SaveToHistoryButton
+              calculatorName="Income Profile"
+              summary={p.hasAnyIncome ? `${PROFILE_LABELS[p.profileType] ?? p.profileType} — net ${formatPHP(p.netIncomePreTax)}, tax ${formatPHP(p.estimatedTax)}` : ''}
+              details={dashboardSnapshot(p)}
+              disabled={!p.hasAnyIncome}
+            />
+          )}
+        </section>
+      )}
+
+      {/* Mixed earners have TWO income boxes; one save action belongs to
+          the pair, spanning beneath both rather than living inside either. */}
+      {p.isMixed && (
+        <div className="save-standalone">
           <SaveToHistoryButton
             calculatorName="Income Profile"
-            summary={p.hasAnyIncome ? `${PROFILE_LABELS[p.profileType] ?? p.profileType} — net ${formatPHP(p.netIncomePreTax)}, tax ${formatPHP(p.estimatedTax)}` : ''}
+            summary={p.hasAnyIncome ? `${PROFILE_LABELS.mixed} — net ${formatPHP(p.netIncomePreTax)}, tax ${formatPHP(p.estimatedTax)}` : ''}
             details={dashboardSnapshot(p)}
             disabled={!p.hasAnyIncome}
           />
-        </section>
+        </div>
       )}
 
       <ErrorFlags errors={p.errors} />

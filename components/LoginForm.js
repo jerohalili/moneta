@@ -82,9 +82,13 @@ export default function LoginForm() {
     setBusy('guest')
     try {
       const result = await authClient.signIn.anonymous()
-      if (result.error) setError(authErrorMessage(result))
-      else done()
-    } finally {
+      if (result.error) {
+        console.error('[guest sign-in]', result.error)
+        setError(authErrorMessage(result))
+      } else done()
+    } catch (e) {
+      console.error('[guest sign-in] network/exception', e)
+      setError('Could not reach the sign-in API — is the dev server running? Details in the browser console.')
       setBusy(null)
     }
   }

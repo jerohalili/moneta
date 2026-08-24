@@ -295,9 +295,9 @@ button:focus-visible,
   box-shadow: 0 4px 16px rgba(20, 128, 74, 0.35);
   transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
   white-space: nowrap;
-  /* Breathing room from the fields above; the card's own padding closes
-     the space below so it never looks glued to the card edge. */
-  margin-top: 6px;
+  /* Breathing room from the fields/disclaimers above; the card's own
+     padding closes the space below so it never looks glued to the edge. */
+  margin-top: 14px;
 }
 
 [data-theme='dark'] .save-btn {
@@ -316,6 +316,12 @@ button:focus-visible,
 
 .save-btn.is-saved {
   background: var(--good);
+}
+
+/* Standalone (outside any card) save action — e.g. the mixed profile's
+   single button spanning beneath both income boxes. */
+.save-standalone {
+  margin-bottom: 20px;
 }
 
 .linklike {
@@ -509,17 +515,36 @@ button:focus-visible,
   white-space: nowrap;
 }
 
+/* Explicit flex column: the block can ONLY be as tall as its visible
+   children — no borders, paddings, or UA styles that pad it out. */
 .history-detail {
-  border-left: 2px solid var(--accent-soft);
-  margin: 2px 0 4px 6px;
-  padding-left: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  align-self: stretch;
+  margin: 8px 0 0 18px;
+  padding: 0;
 }
 
+/* Flex-wrap with content-sized boxes: no reserved grid tracks, so an
+   incomplete last row leaves NO hollow rectangle of empty space. */
 .history-detail-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 8px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin: 0;
+}
+
+/* Each figure gets its own small boxed tile — bare label/value pairs read
+   as loose text and leave the expanded row feeling empty. */
+.history-detail-item {
+  flex: 0 1 170px;
+  min-width: 140px;
+  background: rgba(var(--glass-rgb), 0.5);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 6px 10px;
 }
 
 .history-detail-item dt {
@@ -539,7 +564,7 @@ button:focus-visible,
 }
 
 .history-extra {
-  margin-top: 12px;
+  margin: 0;
 }
 
 .history-extra-heading {
@@ -589,10 +614,24 @@ button:focus-visible,
   white-space: nowrap;
 }
 
-.history-detail-note {
+.history-ledger-more {
   font-size: 11px;
   color: var(--ink-soft);
-  margin: 12px 0 0;
+  margin: 6px 0 0;
+}
+
+/* Compact badge, not a floating paragraph: hands off directly to whatever
+   comes next — no trailing void inside the detail block. */
+.history-detail-note {
+  align-self: flex-start;
+  display: inline-block;
+  font-size: 11px;
+  color: var(--ink-soft);
+  background: rgba(var(--glass-rgb), 0.5);
+  border: 1px dashed var(--rule);
+  border-radius: 999px;
+  padding: 3px 10px;
+  margin: 0;
 }
 
 .theme-toggle {
