@@ -242,7 +242,7 @@ label {
   font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 600;
-  color: #06140D;
+  color: #FFFFFF;
   background: linear-gradient(135deg, var(--accent-strong), var(--accent));
   border: none;
   border-radius: 999px;
@@ -318,7 +318,7 @@ label {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   background: linear-gradient(135deg, var(--accent-strong), var(--accent));
-  color: #06140D;
+  color: #FFFFFF;
   padding: 2px 8px;
   border-radius: 4px;
   margin-left: 8px;
@@ -372,7 +372,6 @@ label {
   color: var(--ink-soft);
   line-height: 1.6;
   margin: 0;
-  max-width: 58ch;
 }
 
 .status-pill {
@@ -388,7 +387,7 @@ label {
 
 .status-pill.live {
   background: linear-gradient(135deg, var(--accent-strong), var(--accent));
-  color: #06140D;
+  color: #FFFFFF;
 }
 
 [data-theme='dark'] .status-pill.live {

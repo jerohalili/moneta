@@ -6,6 +6,7 @@ import { computeMonthlyContributions } from '@/lib/contributions'
 import { formatPHP, formatPercent } from '@/lib/format'
 import StatTile from './StatTile'
 import ErrorFlags from './ErrorFlags'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 export default function MixedIncomeCalculator() {
   const [compInput, setCompInput] = useState('')
@@ -64,6 +65,23 @@ export default function MixedIncomeCalculator() {
         <StatTile label="Total Tax" value={hasIncome ? formatPHP(result.totalTax) : '—'} />
         <StatTile label="Effective Rate" value={hasIncome ? formatPercent(effectiveRate) : '—'} />
       </div>
+
+      {hasIncome && (
+        <div style={{ marginBottom: 20 }}>
+          <SaveToHistoryButton
+            calculatorName="Mixed Income Tax"
+            summary={`Total tax ${formatPHP(result.totalTax)} (comp ${formatPHP(grossCompensation)} + business ${formatPHP(grossReceipts)})`}
+            details={{
+              grossCompensation,
+              grossReceipts,
+              itemizedExpenses,
+              taxOnCompensation: result.employee.total,
+              taxOnBusiness: result.business.best.total,
+              totalTax: result.totalTax,
+            }}
+          />
+        </div>
+      )}
 
       {hasIncome && (
         <section className="card">

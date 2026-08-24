@@ -9,6 +9,7 @@ import CategoryBars from './CategoryBars'
 import RouteComparison from './RouteComparison'
 import TipsList from './TipsList'
 import ErrorFlags from './ErrorFlags'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 export default function FreelancerWorkbench() {
   const wb = useFreelancerTax()
@@ -42,6 +43,22 @@ export default function FreelancerWorkbench() {
         <StatTile label="Est. Take-Home" value={wb.hasIncome ? formatPHP(wb.takeHome) : '—'} />
       </div>
 
+      {wb.hasIncome && (
+        <div style={{ marginBottom: 20 }}>
+          <SaveToHistoryButton
+            calculatorName="Freelancer / Self-Employed Tax"
+            summary={`${wb.comparison.best.method.replace('-', ' ')} route — tax ${formatPHP(wb.comparison.best.total)}`}
+            details={{
+              grossReceipts: wb.grossReceipts,
+              itemizedExpenses: wb.itemizedExpenses,
+              bestRoute: wb.comparison.best.method,
+              estimatedTax: wb.estimatedTax,
+              takeHome: wb.takeHome,
+            }}
+          />
+        </div>
+      )}
+
       <div className="dashboard-row">
         <section className="card">
           <h2>Filing Schedule</h2>
@@ -58,9 +75,8 @@ export default function FreelancerWorkbench() {
             filing time. (The actual BIR quarterly form uses a running cumulative formula, not an even split &mdash;
             this is a planning estimate, not what you&apos;d file.)
           </p>
-          <div className="stat-tile" style={{ border: 'none', padding: 0, background: 'transparent' }}>
-            <div className="stat-label">Set aside per quarter</div>
-            <div className="stat-value">{wb.hasIncome ? formatPHP(wb.quarterlyReserve) : '—'}</div>
+          <div className="stat-grid">
+            <StatTile label="Set aside per quarter" value={wb.hasIncome ? formatPHP(wb.quarterlyReserve) : '—'} />
           </div>
         </section>
       </div>

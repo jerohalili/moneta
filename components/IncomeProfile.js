@@ -10,11 +10,19 @@ import ExpenseLedger from './ExpenseLedger'
 import CategoryBars from './CategoryBars'
 import TipsList from './TipsList'
 import ErrorFlags from './ErrorFlags'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 function businessLabel(profileType) {
   if (profileType === 'business') return 'Gross sales this year (₱)'
   if (profileType === 'mixed') return 'Business gross receipts / sales this year (₱)'
   return 'Gross receipts this year (₱)'
+}
+
+const PROFILE_LABELS = {
+  employee: 'Employee',
+  freelancer: 'Freelancer',
+  business: 'Business Owner',
+  mixed: 'Mixed (Employed + Freelancing)',
 }
 
 export default function IncomeProfile() {
@@ -26,8 +34,9 @@ export default function IncomeProfile() {
       <section className="card glow-card">
         <h2>Income Profile</h2>
         <p className="empty-copy" style={{ marginBottom: 18 }}>
-          Choose the profile that matches how you earn, and everything below fills in for that profile &mdash; no
-          &ldquo;Calculate&rdquo; button, just live numbers as you type.
+          Choose the profile that matches how you earn. Numbers below recalculate live as you type, and your
+          profile is saved in this browser so it&apos;s still here next time — use &ldquo;Save to History&rdquo;
+          below to keep a dated snapshot of a specific result you want to come back to later.
         </p>
         <ProfileTypeSelector value={p.profileType} onChange={p.setProfileType} />
       </section>
@@ -52,9 +61,8 @@ export default function IncomeProfile() {
           </div>
 
           {p.grossCompensationInput !== '' && (
-            <div className="stat-tile" style={{ border: 'none', padding: 0, background: 'transparent', marginBottom: 14 }}>
-              <div className="stat-label">Contributions (computed automatically)</div>
-              <div className="stat-value">{formatPHP(p.autoAnnualContributions)}</div>
+            <div className="stat-grid" style={{ marginBottom: 14 }}>
+              <StatTile label="Contributions (computed automatically)" value={formatPHP(p.autoAnnualContributions)} />
             </div>
           )}
 
@@ -118,6 +126,41 @@ export default function IncomeProfile() {
         </div>
       )}
 
+      {p.hasAnyIncome && (
+        <div style={{ marginBottom: 20 }}>
+          <SaveToHistoryButton
+            calculatorName="Income Profile"
+            summary={`${PROFILE_LABELS[p.profileType] ?? p.profileType} — net ${formatPHP(p.netIncomePreTax)}, tax ${formatPHP(p.estimatedTax)}`}
+            details={{
+              profileType: p.profileType,
+              netIncomePreTax: p.netIncomePreTax,
+              estimatedTax: p.estimatedTax,
+              effectiveRate: p.effectiveRate,
+              takeHome: p.takeHome,
+            }}
+          />
+        </div>
+      )}
+
+      {p.hasEmployeeIncome && (
+        <section className="card">
+          <h2>Net Pay & 13th Month Pay</h2>
+          <p className="empty-copy" style={{ marginBottom: 14 }}>
+            Computed automatically from the same compensation figure above &mdash; no separate visit needed to
+            those calculators, though the full versions are linked below if you want more detail.
+          </p>
+          <div className="stat-grid">
+            <StatTile label="Monthly Take-Home" value={formatPHP(p.netPayResult.netPay)} />
+            <StatTile label="Monthly Withholding Tax" value={formatPHP(p.netPayResult.monthlyWithholdingTax)} />
+            <StatTile label="13th Month Pay" value={formatPHP(p.thirteenthMonthResult.thirteenthMonthPay)} />
+            <StatTile
+              label="13th Month Taxable Excess"
+              value={p.thirteenthMonthResult.taxableAmount > 0 ? formatPHP(p.thirteenthMonthResult.taxableAmount) : 'None (fully exempt)'}
+            />
+          </div>
+        </section>
+      )}
+
       {p.profileType === 'employee' && (
         <section className="card">
           <h2>Filing Schedule</h2>
@@ -146,9 +189,8 @@ export default function IncomeProfile() {
               quarterly form uses a running cumulative formula, not an even split &mdash; this is a planning
               estimate, not what you&apos;d file.)
             </p>
-            <div className="stat-tile" style={{ border: 'none', padding: 0, background: 'transparent' }}>
-              <div className="stat-label">Set aside per quarter</div>
-              <div className="stat-value">{quarterlyReserve != null ? formatPHP(quarterlyReserve) : '—'}</div>
+            <div className="stat-grid">
+              <StatTile label="Set aside per quarter" value={quarterlyReserve != null ? formatPHP(quarterlyReserve) : '—'} />
             </div>
           </section>
         </div>

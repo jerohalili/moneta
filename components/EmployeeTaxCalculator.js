@@ -5,6 +5,7 @@ import { computeEmployeeTax } from '@/lib/employeeTax'
 import { formatPHP, formatPercent } from '@/lib/format'
 import StatTile from './StatTile'
 import ErrorFlags from './ErrorFlags'
+import SaveToHistoryButton from './SaveToHistoryButton'
 
 export default function EmployeeTaxCalculator() {
   const [grossInput, setGrossInput] = useState('')
@@ -64,6 +65,21 @@ export default function EmployeeTaxCalculator() {
         <StatTile label="Effective Rate" value={hasIncome ? formatPercent(effectiveRate) : '—'} />
         <StatTile label="Est. Take-Home" value={hasIncome ? formatPHP(gross - contributions - result.incomeTax) : '—'} />
       </div>
+
+      {hasIncome && (
+        <div style={{ marginBottom: 20 }}>
+          <SaveToHistoryButton
+            calculatorName="Employee Income Tax"
+            summary={`Tax ${formatPHP(result.incomeTax)} on ${formatPHP(gross)} gross`}
+            details={{
+              grossCompensation: gross,
+              contributions,
+              taxableCompensation: result.taxableCompensation,
+              incomeTax: result.incomeTax,
+            }}
+          />
+        </div>
+      )}
 
       <section className="card">
         <h2>How this is computed</h2>
