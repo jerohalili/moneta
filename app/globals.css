@@ -71,6 +71,19 @@ body {
   width: 100%;
   margin: 0 auto;
   padding: 0 0 96px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+main.container {
+  flex: 1 0 auto;
+}
+
+main.container:has(.auth-shell) {
+  display: flex;
+  flex-direction: column;
 }
 
 .container {
@@ -338,7 +351,7 @@ button:focus-visible,
 /* ---------- Auth front door (/login + gate splash) ---------- */
 
 .auth-shell {
-  min-height: calc(100vh - 240px);
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1556,6 +1569,7 @@ label {
 .settings-table-block {
   padding: 16px 0;
   border-top: 1px solid var(--rule);
+  overflow-x: auto;
 }
 
 .settings-field-head {
@@ -1733,4 +1747,69 @@ label {
 .settings-table-remove:disabled {
   opacity: 0.35;
   cursor: default;
+}
+
+/* ---------- Responsive: small screens ---------- */
+
+@media (max-width: 640px) {
+  .masthead-bar {
+    margin-bottom: 24px;
+  }
+
+  .masthead {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-top: 18px;
+    padding-bottom: 8px;
+  }
+
+  .brand {
+    text-align: center;
+  }
+
+  .masthead h1 {
+    font-size: 24px;
+  }
+
+  .nav {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 6px;
+  }
+
+  .nav-link {
+    padding: 10px 12px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-shell {
+    padding-bottom: 48px;
+  }
+
+  .card {
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .route.best {
+    margin: 0 -20px;
+    padding: 14px 20px;
+  }
+
+  .auth-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .deadline-card {
+    flex-wrap: wrap;
+  }
+
+  .category-bar-row {
+    grid-template-columns: minmax(96px, 140px) 1fr auto;
+    gap: 8px;
+  }
 }
