@@ -385,7 +385,7 @@ export function useIncomeProfile() {
       )
     }
     if (needsBusinessFields && hasBusinessIncome && itemizedExpenses > grossReceipts) {
-      list.push('Your logged expenses add up to more than your gross receipts/sales — double-check the ledger below.')
+      list.push('Your logged expenses add up to more than your gross receipts/sales — double-check the ledger above.')
     }
     if (hasCorporateIncome && corpDeductions > corpGrossSales) {
       list.push('Corporate deductions exceed gross sales, which zeroes out taxable income — double-check both figures.')

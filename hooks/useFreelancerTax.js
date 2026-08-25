@@ -69,7 +69,7 @@ export function useFreelancerTax() {
       list.push('Gross receipts can\u2019t be negative — check the number you entered.')
     }
     if (hasIncome && itemizedExpenses > grossReceipts) {
-      list.push('Your logged expenses add up to more than your gross receipts — double-check the ledger below.')
+      list.push('Your logged expenses add up to more than your gross receipts — double-check the ledger above.')
     }
     return list
   }, [grossReceiptsInput, grossReceipts, itemizedExpenses, hasIncome])

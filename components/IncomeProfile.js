@@ -360,29 +360,41 @@ export default function IncomeProfile() {
             />
             I&apos;m already VAT-registered
           </label>
+        </section>
+      )}
 
-          {!p.isMixed && (
+      {/* The ledger is an INPUT (it feeds the itemized-deduction route and
+          the advisor), so it lives with the other inputs — above the results
+          — rather than buried below them where it gets skipped. The save
+          action sits at the BOTTOM of the ledger: it snapshots the whole
+          profile, so it belongs after the LAST input, not inside any single
+          income card. */}
+      {p.needsBusinessFields && (
+        <>
+          <section className="card">
+            <h2>Write-off Ledger</h2>
+            <ExpenseLedger
+              draft={p.draft}
+              setDraft={p.setDraft}
+              addEntry={p.addEntry}
+              ledger={p.ledger}
+              removeEntry={p.removeEntry}
+              compact
+            />
+
             <SaveToHistoryButton
               calculatorName="Income Profile"
               summary={p.hasAnyIncome ? `${PROFILE_LABELS[p.profileType] ?? p.profileType} — net ${formatPHP(p.netIncomePreTax)}, tax ${formatPHP(p.estimatedTax)}` : ''}
               details={dashboardSnapshot(p)}
               disabled={!p.hasAnyIncome}
             />
-          )}
-        </section>
-      )}
+          </section>
 
-      {/* Mixed earners have TWO income boxes; one save action belongs to
-          the pair, spanning beneath both rather than living inside either. */}
-      {p.isMixed && (
-        <div className="save-standalone">
-          <SaveToHistoryButton
-            calculatorName="Income Profile"
-            summary={p.hasAnyIncome ? `${PROFILE_LABELS.mixed} — net ${formatPHP(p.netIncomePreTax)}, tax ${formatPHP(p.estimatedTax)}` : ''}
-            details={dashboardSnapshot(p)}
-            disabled={!p.hasAnyIncome}
-          />
-        </div>
+          <section className="card">
+            <h2>Expense Categories</h2>
+            <CategoryBars categoryTotals={p.categoryTotals} />
+          </section>
+        </>
       )}
 
       <ErrorFlags errors={p.errors} />
@@ -520,34 +532,13 @@ export default function IncomeProfile() {
             <p className="empty-copy" style={{ marginBottom: 12 }}>
               A simple even split of your estimated annual business tax across four quarters. (The actual BIR
               quarterly form uses a running cumulative formula, not an even split &mdash; this is a planning
-              estimate, not what you&apos;d file.)
+              estimate, not what you&apos;d file. The Quarterly Income Tax calculator computes the real worksheet.)
             </p>
             <div className="stat-grid">
               <StatTile label="Set aside per quarter" value={quarterlyReserve != null ? formatPHP(quarterlyReserve) : '—'} />
             </div>
           </section>
         </div>
-      )}
-
-      {p.needsBusinessFields && (
-        <>
-          <section className="card">
-            <h2>Expense Categories</h2>
-            <CategoryBars categoryTotals={p.categoryTotals} />
-          </section>
-
-          <section className="card">
-            <h2>Write-off Ledger</h2>
-            <ExpenseLedger
-              draft={p.draft}
-              setDraft={p.setDraft}
-              addEntry={p.addEntry}
-              ledger={p.ledger}
-              removeEntry={p.removeEntry}
-              compact
-            />
-          </section>
-        </>
       )}
     </>
   )

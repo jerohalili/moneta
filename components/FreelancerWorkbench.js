@@ -33,18 +33,37 @@ export default function FreelancerWorkbench() {
           />
         </div>
 
-        <SaveToHistoryButton
-          calculatorName="Freelancer / Self-Employed Tax"
-          summary={wb.hasIncome ? `${wb.comparison.best.method.replace('-', ' ')} route — tax ${formatPHP(wb.comparison.best.total)}` : ''}
-          details={{
-            grossReceipts: wb.grossReceipts,
-            itemizedExpenses: wb.itemizedExpenses,
-            bestRoute: wb.comparison?.best?.method,
-            estimatedTax: wb.estimatedTax,
-            takeHome: wb.takeHome,
-          }}
-          disabled={!wb.hasIncome}
+      <SaveToHistoryButton
+        calculatorName="Freelancer / Self-Employed Tax"
+        summary={wb.hasIncome ? `${wb.comparison.best.method.replace('-', ' ')} route — tax ${formatPHP(wb.comparison.best.total)}` : ''}
+        details={{
+          grossReceipts: wb.grossReceipts,
+          itemizedExpenses: wb.itemizedExpenses,
+          bestRoute: wb.comparison?.best?.method,
+          estimatedTax: wb.estimatedTax,
+          takeHome: wb.takeHome,
+        }}
+        disabled={!wb.hasIncome}
+      />
+      </section>
+
+      {/* The ledger is an INPUT (it drives the itemized route), so it sits
+          with the inputs — above the results — not buried at the bottom. */}
+      <section className="card">
+        <h2>Write-off Ledger</h2>
+        <ExpenseLedger
+          draft={wb.draft}
+          setDraft={wb.setDraft}
+          addEntry={wb.addEntry}
+          ledger={wb.ledger}
+          removeEntry={wb.removeEntry}
+          compact={false}
         />
+      </section>
+
+      <section className="card">
+        <h2>Expense Categories</h2>
+        <CategoryBars categoryTotals={wb.categoryTotals} />
       </section>
 
       <ErrorFlags errors={wb.errors} />
@@ -70,30 +89,14 @@ export default function FreelancerWorkbench() {
           <p className="empty-copy" style={{ marginBottom: 12 }}>
             A simple even split of your estimated annual tax across four quarters, so you&apos;re not caught short at
             filing time. (The actual BIR quarterly form uses a running cumulative formula, not an even split &mdash;
-            this is a planning estimate, not what you&apos;d file.)
+            this is a planning estimate, not what you&apos;d file. The Quarterly Income Tax calculator computes the
+            real worksheet.)
           </p>
           <div className="stat-grid">
             <StatTile label="Set aside per quarter" value={wb.hasIncome ? formatPHP(wb.quarterlyReserve) : '—'} />
           </div>
         </section>
       </div>
-
-      <section className="card">
-        <h2>Expense Categories</h2>
-        <CategoryBars categoryTotals={wb.categoryTotals} />
-      </section>
-
-      <section className="card">
-        <h2>Write-off Ledger</h2>
-        <ExpenseLedger
-          draft={wb.draft}
-          setDraft={wb.setDraft}
-          addEntry={wb.addEntry}
-          ledger={wb.ledger}
-          removeEntry={wb.removeEntry}
-          compact={false}
-        />
-      </section>
 
       {wb.hasIncome && (
         <section className="card">
@@ -111,8 +114,7 @@ export default function FreelancerWorkbench() {
 
       <p className="disclaimer">
         This is general information based on codified BIR rules (see the cited provisions above), not personalized
-        tax advice. Numbers are session-only &mdash; nothing is saved once you close this tab, since accounts and
-        storage aren&apos;t wired up yet.
+        tax advice. Your figures are saved in this browser and sync to your account when you&apos;re signed in.
       </p>
     </>
   )
