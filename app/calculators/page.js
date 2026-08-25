@@ -24,6 +24,16 @@ const CATEGORIES = [
         description: 'Combined tax on employment salary and business/freelance income.',
         href: '/calculators/mixed-income',
       },
+      {
+        name: 'Rental Income (8% Election)',
+        description: 'Landlords: 8% flat on gross vs. graduated with your actual expenses.',
+        href: '/calculators/rental',
+      },
+      {
+        name: 'Passive Income & Final Taxes',
+        description: 'Interest, dividends, royalties, share gains, and prizes — flat final taxes.',
+        href: '/calculators/passive-income',
+      },
     ],
   },
   {
@@ -118,6 +128,11 @@ const CATEGORIES = [
         name: 'BIR Form Finder',
         description: 'Answer a few questions to find out exactly which forms you need to file.',
         href: '/calculators/form-finder',
+      },
+      {
+        name: 'Quarterly Income Tax (1701Q)',
+        description: 'The cumulative quarter-by-quarter worksheet with withholding credits.',
+        href: '/calculators/quarterly-income-tax',
       },
     ],
   },

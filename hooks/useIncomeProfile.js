@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { compareRoutes } from '@/lib/freelancerTax'
 import { computeEmployeeTax } from '@/lib/employeeTax'
+import { computeCorporateTax } from '@/lib/corporateTax'
 import { computeMonthlyContributions } from '@/lib/contributions'
 import { computeNetPay } from '@/lib/netPay'
 import { computeThirteenthMonthPay } from '@/lib/thirteenthMonthPay'
@@ -15,9 +16,14 @@ import useTaxRatesVersion from './useTaxRatesVersion'
 
 export const PROFILE_TYPES = [
   { id: 'employee', label: 'Employee', description: 'Compensation income, one employer.' },
-  { id: 'freelancer', label: 'Freelancer', description: 'Self-employed / professional income.' },
+  { id: 'employee-multi', label: 'Employee — Multiple Employers', description: 'Two or more employers in the same year.' },
+  { id: 'smwe', label: 'Minimum Wage Earner', description: 'Compensation at or near the statutory minimum wage.' },
+  { id: 'ofw', label: 'OFW / Non-Resident Citizen', description: 'Working abroad — only PH-source income is taxed here.' },
+  { id: 'freelancer', label: 'Freelancer / Professional', description: 'Self-employed or professional practice income.' },
   { id: 'business', label: 'Business Owner', description: 'Sole proprietorship gross sales.' },
   { id: 'mixed', label: 'Mixed (Employed + Freelancing)', description: 'Both compensation and business income.' },
+  { id: 'corporation', label: 'Corporation / OPC', description: 'Domestic corporation, incl. One Person Corporations.' },
+  { id: 'estate-trust', label: 'Estate or Trust', description: 'Taxed on the individual graduated table (NIRC Sec. 60).' },
 ]
 
 const STORAGE_KEY = 'income-profile'
@@ -56,6 +62,13 @@ export function useIncomeProfile() {
   const [grossReceiptsInput, setGrossReceiptsInput] = useState('')
   const [totalAssetsInput, setTotalAssetsInput] = useState('')
   const [vatRegistered, setVatRegistered] = useState(false)
+  const [withheldTaxInput, setWithheldTaxInput] = useState('')
+  const [smwAnnualInput, setSmwAnnualInput] = useState('')
+  const [foreignIncomeInput, setForeignIncomeInput] = useState('')
+  const [corpGrossSalesInput, setCorpGrossSalesInput] = useState('')
+  const [corpDeductionsInput, setCorpDeductionsInput] = useState('')
+  const [corpAssetsInput, setCorpAssetsInput] = useState('')
+  const [corpYearsInput, setCorpYearsInput] = useState('')
   const [ledger, setLedger] = useState([])
   const [draft, setDraft] = useState({
     label: '',
@@ -79,6 +92,13 @@ export function useIncomeProfile() {
       setGrossReceiptsInput(saved.grossReceiptsInput ?? '')
       setTotalAssetsInput(saved.totalAssetsInput ?? '')
       setVatRegistered(saved.vatRegistered ?? false)
+      setWithheldTaxInput(saved.withheldTaxInput ?? '')
+      setSmwAnnualInput(saved.smwAnnualInput ?? '')
+      setForeignIncomeInput(saved.foreignIncomeInput ?? '')
+      setCorpGrossSalesInput(saved.corpGrossSalesInput ?? '')
+      setCorpDeductionsInput(saved.corpDeductionsInput ?? '')
+      setCorpAssetsInput(saved.corpAssetsInput ?? '')
+      setCorpYearsInput(saved.corpYearsInput ?? '')
       setLedger(saved.ledger ?? [])
     }
     setHydrated(true)
@@ -99,10 +119,22 @@ export function useIncomeProfile() {
       grossReceiptsInput,
       totalAssetsInput,
       vatRegistered,
+      withheldTaxInput,
+      smwAnnualInput,
+      foreignIncomeInput,
+      corpGrossSalesInput,
+      corpDeductionsInput,
+      corpAssetsInput,
+      corpYearsInput,
       ledger,
     })
     if (typeof window !== 'undefined') window.dispatchEvent(new Event('moneta:profile-changed'))
-  }, [hydrated, profileType, grossCompensationInput, contributionsOverride, useContributionsOverride, grossReceiptsInput, totalAssetsInput, vatRegistered, ledger])
+  }, [
+    hydrated, profileType, grossCompensationInput, contributionsOverride, useContributionsOverride,
+    grossReceiptsInput, totalAssetsInput, vatRegistered, withheldTaxInput, smwAnnualInput,
+    foreignIncomeInput, corpGrossSalesInput, corpDeductionsInput, corpAssetsInput, corpYearsInput,
+    ledger,
+  ])
 
   // Cloud sync may replace the stored profile after sign-in (or when a
   // guest upgrades to a real account). Re-read localStorage into state so
@@ -120,15 +152,32 @@ export function useIncomeProfile() {
       setGrossReceiptsInput(saved?.grossReceiptsInput ?? '')
       setTotalAssetsInput(saved?.totalAssetsInput ?? '')
       setVatRegistered(saved?.vatRegistered ?? false)
+      setWithheldTaxInput(saved?.withheldTaxInput ?? '')
+      setSmwAnnualInput(saved?.smwAnnualInput ?? '')
+      setForeignIncomeInput(saved?.foreignIncomeInput ?? '')
+      setCorpGrossSalesInput(saved?.corpGrossSalesInput ?? '')
+      setCorpDeductionsInput(saved?.corpDeductionsInput ?? '')
+      setCorpAssetsInput(saved?.corpAssetsInput ?? '')
+      setCorpYearsInput(saved?.corpYearsInput ?? '')
       setLedger(saved?.ledger ?? [])
     }
     window.addEventListener('moneta:data-imported', rehydrate)
     return () => window.removeEventListener('moneta:data-imported', rehydrate)
   }, [])
 
-  const needsEmployeeFields = profileType === 'employee' || profileType === 'mixed'
-  const needsBusinessFields = profileType === 'freelancer' || profileType === 'business' || profileType === 'mixed'
+  const needsEmployeeFields = ['employee', 'employee-multi', 'mixed', 'smwe', 'ofw'].includes(profileType)
+  const needsBusinessFields = ['freelancer', 'business', 'mixed'].includes(profileType)
+  const needsCorporateFields = profileType === 'corporation'
+  const needsEstateTrustFields = profileType === 'estate-trust'
   const isMixed = profileType === 'mixed'
+  const isMultiEmployer = profileType === 'employee-multi'
+  const isSmwe = profileType === 'smwe'
+  const isOfw = profileType === 'ofw'
+  // Net Pay / 13th Month auto-orchestration only makes sense when the
+  // compensation figure belongs to ONE employer — a multi-employer
+  // employee's monthly net depends on how the split, so showing a single
+  // "monthly take-home" off the combined figure would mislead.
+  const needsPayrollTiles = ['employee', 'smwe', 'ofw'].includes(profileType)
 
   // Bumps whenever rates are edited on /settings — included in every
   // memo dependency below so the whole snapshot recomputes live.
@@ -142,6 +191,18 @@ export function useIncomeProfile() {
 
   const grossCompensation = Math.max(0, Number(grossCompensationInput) || 0)
   const grossReceipts = Math.max(0, Number(grossReceiptsInput) || 0)
+
+  const withheldTax =
+    isMultiEmployer && withheldTaxInput.trim() !== ''
+      ? Math.max(0, Number(withheldTaxInput) || 0)
+      : null
+  const smwAnnual = isSmwe ? Math.max(0, Number(smwAnnualInput) || 0) : 0
+  const foreignIncome =
+    isOfw && foreignIncomeInput.trim() !== '' ? Math.max(0, Number(foreignIncomeInput) || 0) : 0
+  const corpGrossSales = Math.max(0, Number(corpGrossSalesInput) || 0)
+  const corpDeductions = Math.max(0, Number(corpDeductionsInput) || 0)
+  const corpAssets = corpAssetsInput.trim() === '' ? null : Math.max(0, Number(corpAssetsInput) || 0)
+  const corpYears = Math.max(0, Math.floor(Number(corpYearsInput) || 0))
 
   const autoContributions = useMemo(
     () => {
@@ -165,32 +226,76 @@ export function useIncomeProfile() {
 
   const hasEmployeeIncome = needsEmployeeFields && grossCompensation > 0
   const hasBusinessIncome = needsBusinessFields && grossReceipts > 0
-  const hasAnyIncome = hasEmployeeIncome || hasBusinessIncome
+  const hasEstateTrustIncome = needsEstateTrustFields && grossCompensation > 0
+  const hasCorporateIncome = needsCorporateFields && corpGrossSales > 0
+  const hasAnyIncome =
+    hasEmployeeIncome || hasBusinessIncome || hasEstateTrustIncome || hasCorporateIncome
 
   const employeeResult = useMemo(
     () => {
       void ratesVersion
-      return hasEmployeeIncome ? computeEmployeeTax({ grossCompensation, mandatoryContributions }) : null
+      if (!hasEmployeeIncome) return null
+      if (isSmwe) {
+        // Statutory minimum wage earners (RA 9504): the minimum-wage
+        // portion of compensation is exempt, so only the excess above the
+        // SMW (minus contributions) runs through the bracket table.
+        return computeEmployeeTax({
+          grossCompensation: Math.max(0, grossCompensation - smwAnnual),
+          mandatoryContributions,
+        })
+      }
+      return computeEmployeeTax({
+        grossCompensation,
+        mandatoryContributions,
+        withheldTax: isMultiEmployer ? withheldTax : null,
+      })
     },
-    [hasEmployeeIncome, grossCompensation, mandatoryContributions, ratesVersion]
+    [hasEmployeeIncome, isSmwe, isMultiEmployer, grossCompensation, smwAnnual, mandatoryContributions, withheldTax, ratesVersion]
+  )
+
+  const estateTrustResult = useMemo(
+    () => {
+      void ratesVersion
+      // Estates and trusts compute like individuals on the graduated
+      // table (NIRC Sec. 60) — but pay no SSS/PhilHealth/Pag-IBIG.
+      return hasEstateTrustIncome
+        ? computeEmployeeTax({ grossCompensation, mandatoryContributions: 0 })
+        : null
+    },
+    [hasEstateTrustIncome, grossCompensation, ratesVersion]
+  )
+
+  const corporateResult = useMemo(
+    () => {
+      void ratesVersion
+      if (!hasCorporateIncome) return null
+      return computeCorporateTax({
+        grossIncome: corpGrossSales,
+        netTaxableIncome: Math.max(0, corpGrossSales - corpDeductions),
+        totalAssets: corpAssets ?? 0,
+        yearsInOperation: corpYears,
+      })
+    },
+    [hasCorporateIncome, corpGrossSales, corpDeductions, corpAssets, corpYears, ratesVersion]
   )
 
   // Auto-orchestration: Net Pay and 13th Month Pay run automatically off
   // the same compensation figure, rather than requiring a separate visit
-  // to each calculator page.
+  // to each calculator page. Only for single-employer compensation
+  // profiles (see needsPayrollTiles above).
   const netPayResult = useMemo(
     () => {
       void ratesVersion
-      return hasEmployeeIncome ? computeNetPay({ monthlyGrossCompensation: grossCompensation / 12 }) : null
+      return needsPayrollTiles && grossCompensation > 0 ? computeNetPay({ monthlyGrossCompensation: grossCompensation / 12 }) : null
     },
-    [hasEmployeeIncome, grossCompensation, ratesVersion]
+    [needsPayrollTiles, grossCompensation, ratesVersion]
   )
   const thirteenthMonthResult = useMemo(
     () => {
       void ratesVersion
-      return hasEmployeeIncome ? computeThirteenthMonthPay({ totalBasicSalary: grossCompensation }) : null
+      return needsPayrollTiles && grossCompensation > 0 ? computeThirteenthMonthPay({ totalBasicSalary: grossCompensation }) : null
     },
-    [hasEmployeeIncome, grossCompensation, ratesVersion]
+    [needsPayrollTiles, grossCompensation, ratesVersion]
   )
 
   const businessComparison = useMemo(
@@ -221,16 +326,33 @@ export function useIncomeProfile() {
             hasEmployeeIncome,
             hasBusinessIncome,
             isMixed,
+            isMultiEmployer,
+            isSmwe,
+            isOfw,
+            isEstateTrust: needsEstateTrustFields,
+            smwAnnual,
+            foreignIncome,
             employeeResult,
+            estateTrustResult,
             comparison: businessComparison,
             thirteenthMonthResult,
+            corporate: corporateResult
+              ? {
+                  grossIncome: corpGrossSales,
+                  netTaxableIncome: Math.max(0, corpGrossSales - corpDeductions),
+                  yearsInOperation: corpYears,
+                  result: corporateResult,
+                }
+              : null,
           })
         : null
     },
     [
       hasAnyIncome, profileType, grossCompensation, grossReceipts, itemizedExpenses,
       mandatoryContributions, totalAssets, vatRegistered, hasEmployeeIncome,
-      hasBusinessIncome, isMixed, employeeResult, businessComparison, thirteenthMonthResult,
+      hasBusinessIncome, isMixed, isMultiEmployer, isSmwe, isOfw, needsEstateTrustFields,
+      smwAnnual, foreignIncome, employeeResult, estateTrustResult, businessComparison,
+      thirteenthMonthResult, corporateResult, corpGrossSales, corpDeductions, corpYears,
       ratesVersion,
     ]
   )
@@ -265,15 +387,30 @@ export function useIncomeProfile() {
     if (needsBusinessFields && hasBusinessIncome && itemizedExpenses > grossReceipts) {
       list.push('Your logged expenses add up to more than your gross receipts/sales — double-check the ledger below.')
     }
+    if (hasCorporateIncome && corpDeductions > corpGrossSales) {
+      list.push('Corporate deductions exceed gross sales, which zeroes out taxable income — double-check both figures.')
+    }
+    if (isSmwe && smwAnnual > grossCompensation && grossCompensation > 0) {
+      list.push(
+        'The minimum wage you entered exceeds your gross compensation — the exemption can\'t reduce taxable income below zero.'
+      )
+    }
     return list
-  }, [useContributionsOverride, contributionsOverride, grossCompensation, hasEmployeeIncome, autoAnnualContributions, needsBusinessFields, hasBusinessIncome, itemizedExpenses, grossReceipts])
+  }, [
+    useContributionsOverride, contributionsOverride, grossCompensation, hasEmployeeIncome,
+    autoAnnualContributions, needsBusinessFields, hasBusinessIncome, itemizedExpenses,
+    grossReceipts, hasCorporateIncome, corpDeductions, corpGrossSales, isSmwe, smwAnnual,
+  ])
 
-  // Deliberately defined the same way across all four profile types, so
-  // the four headline stat tiles mean the same thing no matter which
-  // profile is selected.
-  const grossIncome = grossCompensation + grossReceipts
-  const totalDeductions = mandatoryContributions + itemizedExpenses
-  const estimatedTax = (employeeResult?.total ?? 0) + (businessComparison?.best.total ?? 0)
+  // Deliberately defined the same way across every profile type, so the
+  // headline stat tiles mean the same thing no matter which is selected.
+  const grossIncome = grossCompensation + grossReceipts + corpGrossSales
+  const totalDeductions = mandatoryContributions + itemizedExpenses + corpDeductions
+  const estimatedTax =
+    (employeeResult?.total ?? 0) +
+    (businessComparison?.best.total ?? 0) +
+    (estateTrustResult?.total ?? 0) +
+    (corporateResult?.tax ?? 0)
   const netIncomePreTax = hasAnyIncome ? grossIncome - totalDeductions : null
   const effectiveRate = hasAnyIncome && grossIncome > 0 ? estimatedTax / grossIncome : null
   const takeHome = hasAnyIncome ? grossIncome - totalDeductions - estimatedTax : null
@@ -325,7 +462,27 @@ export function useIncomeProfile() {
     setTotalAssetsInput,
     vatRegistered,
     setVatRegistered,
-    totalAssets,
+    withheldTaxInput,
+    setWithheldTaxInput,
+    smwAnnualInput,
+    setSmwAnnualInput,
+    foreignIncomeInput,
+    setForeignIncomeInput,
+    corpGrossSalesInput,
+    setCorpGrossSalesInput,
+    corpDeductionsInput,
+    setCorpDeductionsInput,
+    corpAssetsInput,
+    setCorpAssetsInput,
+    corpYearsInput,
+    setCorpYearsInput,
+    withheldTax,
+    smwAnnual,
+    foreignIncome,
+    corpGrossSales,
+    corpDeductions,
+    corpAssets,
+    corpYears,
     ledger,
     draft,
     setDraft,
@@ -333,11 +490,21 @@ export function useIncomeProfile() {
     removeEntry,
     needsEmployeeFields,
     needsBusinessFields,
+    needsCorporateFields,
+    needsEstateTrustFields,
+    needsPayrollTiles,
     isMixed,
+    isMultiEmployer,
+    isSmwe,
+    isOfw,
     hasAnyIncome,
     hasEmployeeIncome,
     hasBusinessIncome,
+    hasEstateTrustIncome,
+    hasCorporateIncome,
     employeeResult,
+    estateTrustResult,
+    corporateResult,
     netPayResult,
     thirteenthMonthResult,
     businessComparison,

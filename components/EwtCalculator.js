@@ -89,6 +89,13 @@ export default function EwtCalculator() {
           payment, not an extra tax. Government money payments use ATC codes WI640/WC640 (goods) and
           WI157/WC157 (services); the same 1%/2% rates apply to purchases by BIR-designated Top Withholding Agents.
         </p>
+        <p className="empty-copy" style={{ marginTop: 10 }}>
+          What this means for your cash flow: on a {formatPHP(grossAmount || 0)} invoice you only actually receive{' '}
+          <strong>{formatPHP((result?.netPayment ?? 0))}</strong> — the rest is your advance tax. Collect your 2307
+          certificates each quarter and credit them on the{' '}
+          <a href="/calculators/quarterly-income-tax" style={{ color: 'var(--accent)' }}>Quarterly Income Tax (1701Q)</a>{' '}
+          worksheet, or they&apos;re money left on the table.
+        </p>
         <p className="disclaimer" style={{ marginTop: 12 }}>
           This covers the most common EWT categories for everyday transactions — not the full ~40-item ATC table,
           which includes narrower categories like income distributions to estate beneficiaries, general

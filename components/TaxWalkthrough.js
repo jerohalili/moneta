@@ -49,7 +49,7 @@ export default function TaxWalkthrough({ walkthroughs }) {
               <tbody>
                 {wt.slices.length === 0 && (
                   <tr>
-                    <td colSpan={4}>Taxable income is zero — everything fits under the exemption.</td>
+                    <td colSpan={4}>{wt.slicesEmptyNote ?? 'Taxable income is zero — everything fits under the exemption.'}</td>
                   </tr>
                 )}
                 {wt.slices.map((slice) => (

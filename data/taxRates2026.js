@@ -158,3 +158,20 @@ export const OT_SPECIAL_HOLIDAY_OT_MULTIPLIER = 1.30 * 1.30
 export const OT_REGULAR_HOLIDAY_MULTIPLIER = 2.00
 export const OT_REGULAR_HOLIDAY_OT_MULTIPLIER = 2.00 * 1.30
 export const NIGHT_DIFFERENTIAL_MULTIPLIER = 0.10 // additional, for hours worked 10PM–6AM
+
+// --- Passive income final taxes (withheld at source, NIRC Secs. 24(B)(1),
+// 27(D)(1), 57(A)) — these never enter the annual graduated return ---
+export const FINAL_TAX_INTEREST_RATE = 0.20 // peso bank deposits, deposit substitutes, trust funds
+export const FINAL_TAX_FC_INTEREST_RATE = 0.15 // foreign-currency deposits under the FCDU system, RA 6426
+export const FINAL_TAX_DIVIDEND_RATE = 0.10 // cash/property dividends from domestic corporations
+export const FINAL_TAX_ROYALTY_RATE = 0.20 // royalties, general
+export const FINAL_TAX_ROYALTY_BOOKS_RATE = 0.10 // royalties from books, literary works, lectures (Sec. 24(B)(1)(b))
+export const FINAL_TAX_CGT_SHARES_RATE = 0.15 // capital gains on shares NOT traded on the stock exchange
+export const STOCK_TRANSACTION_TAX_RATE = 0.006 // shares traded on the stock exchange, on gross selling price
+export const FINAL_TAX_PRIZES_RATE = 0.20 // prizes & winnings above the per-occasion exemption
+export const FINAL_TAX_PRIZES_EXEMPTION = 10_000 // per occasion
+
+// Residential units rented at or below this monthly amount per unit are
+// exempt from PERCENTAGE tax (income tax still applies) — NIRC Sec. 109
+// as amended, RR 13-2018.
+export const RESIDENTIAL_RENT_PCT_TAX_EXEMPT = 15_000
