@@ -123,7 +123,7 @@ export default function IncomeProfile() {
                 id="withheld-tax"
                 type="number"
                 inputMode="decimal"
-                placeholder="e.g. 55000 — from both employers' 2316 certificates"
+                placeholder="e.g. 55000 — from ALL employers' 2316 certificates"
                 value={p.withheldTaxInput}
                 onChange={(e) => p.setWithheldTaxInput(e.target.value)}
               />
@@ -184,7 +184,9 @@ export default function IncomeProfile() {
               checked={p.useContributionsOverride}
               onChange={(e) => p.setUseContributionsOverride(e.target.checked)}
             />
-            My actual contributions are different (irregular pay, multiple employers, etc.)
+            {p.isMultiEmployer
+              ? 'My actual contributions are different — they stack per employer, so the auto figure (computed on combined pay) is wrong'
+              : 'My actual contributions are different (irregular pay, voluntary SSS member, etc.)'}
           </label>
 
           {p.useContributionsOverride && (
@@ -194,10 +196,17 @@ export default function IncomeProfile() {
                 id="contributions-override"
                 type="number"
                 inputMode="decimal"
-                placeholder="e.g. 21000"
+                placeholder={p.isMultiEmployer ? 'e.g. 32000 — all employers\' shares combined' : 'e.g. 21000'}
                 value={p.contributionsOverride}
                 onChange={(e) => p.setContributionsOverride(e.target.value)}
               />
+              {p.isMultiEmployer && (
+                <p className="empty-copy" style={{ marginTop: 6 }}>
+                  Each employer withholds and pays contributions on your salary with THEM alone, with separate SSS
+                  monthly-salary-credit caps — so two employers legitimately contribute more than one would on the
+                  same combined pay. Check every payslip and enter the combined total.
+                </p>
+              )}
             </div>
           )}
 
@@ -443,7 +452,7 @@ export default function IncomeProfile() {
           <h2>Filing Schedule</h2>
           <p className="empty-copy">
             With multiple employers, substituted filing does NOT cover you: each employer issues their own BIR Form
-            2316, and YOU must file BIR Form 1700 by April 15, combining both incomes and settling any balance due.
+            2316, and YOU must file BIR Form 1700 by April 15, combining all incomes and settling any balance due.
             Each employer withholds against your salary with them alone &mdash; the combined tax is almost always
             higher than the combined withholding.
           </p>

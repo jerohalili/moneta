@@ -70,7 +70,7 @@ export default function EmployeeTaxCalculator() {
             id="gross-comp"
             type="number"
             inputMode="decimal"
-            placeholder={mode === 'multi' ? 'e.g. 420000 + 300000 = 720000' : 'e.g. 600000'}
+            placeholder={mode === 'multi' ? 'e.g. 420000 + 300000 + 150000 = 870000' : 'e.g. 600000'}
             value={grossInput}
             onChange={(e) => setGrossInput(e.target.value)}
           />

@@ -127,7 +127,7 @@ export default function VariableIncomeCalculator() {
         </p>
         <p className="disclaimer" style={{ marginTop: 12 }}>
           If you had more than one employer during the year, note that you generally can&apos;t rely on substituted
-          filing — you&apos;ll likely need to file BIR Form 1700 yourself, combining both employers&apos; 2316s.
+          filing — you&apos;ll likely need to file BIR Form 1700 yourself, combining all employers&apos; 2316s.
         </p>
       </section>
     </>
