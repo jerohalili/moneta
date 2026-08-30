@@ -111,7 +111,7 @@ export default function LoginForm() {
       )}
 
       <div className="auth-actions">
-        <button type="button" className="btn-primary" onClick={handleGoogle} disabled={busy !== null}>
+        <button type="button" className="settings-secondary-btn" onClick={handleGoogle} disabled={busy !== null}>
           {busy === 'google' ? 'Redirecting…' : 'Continue with Google'}
         </button>
         <button type="button" className="settings-secondary-btn" onClick={handleGuest} disabled={busy !== null}>
