@@ -23,7 +23,7 @@ const inter = Inter({
 })
 
 export const metadata = {
-  title: 'Moneta — Philippine tax, computed plainly.',
+  title: 'Moneta',
   description:
     'Free Philippine tax calculators with a rule-based advisor that flags legal ways to lower what you owe.',
 }
