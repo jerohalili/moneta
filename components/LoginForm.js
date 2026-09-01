@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { startTransition, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { authClient, authErrorMessage } from '@/lib/auth-client'
 import { SYNC_EVENTS } from '@/lib/cloudSync'
@@ -24,8 +24,15 @@ export default function LoginForm() {
 
   function done() {
     setTimeout(() => {
-      router.push(searchParams.get('next') || '/')
-      router.refresh()
+      // router.push() isn't guaranteed to finish before router.refresh() runs
+      // (a known Next.js App Router race — vercel/next.js#54766), so refresh
+      // can fire against the pre-navigation route and the destination renders
+      // stale until a manual reload forces a fresh request. Wrapping both in
+      // one transition keeps them ordered.
+      startTransition(() => {
+        router.push(searchParams.get('next') || '/')
+        router.refresh()
+      })
     }, 50)
   }
 
