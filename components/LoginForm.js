@@ -92,7 +92,10 @@ export default function LoginForm() {
       if (result.error) {
         console.error('[guest sign-in]', result.error)
         setError(authErrorMessage(result))
-      } else done()
+      } else {
+        router.refresh()
+        done()
+      }
     } catch (e) {
       console.error('[guest sign-in] network/exception', e)
       setError('Could not reach the sign-in API — is the dev server running? Details in the browser console.')
