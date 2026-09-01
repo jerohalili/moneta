@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Sun, Moon } from 'lucide-react'
 
 // Starts as null (unknown) so server and client render the same empty button
 // first. Right after mount, this reads the theme the inline script in
@@ -38,8 +39,8 @@ export default function ThemeToggle() {
       onClick={toggle}
       aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      <span className="theme-toggle-icon" aria-hidden="true">{theme === 'dark' ? '☾' : '☀'}</span>
-      {theme === 'dark' ? 'Dark' : 'Light'}
+      {theme === 'dark' ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
+      <span className="theme-toggle-text">{theme === 'dark' ? 'Light' : 'Dark'}</span>
     </button>
   )
 }

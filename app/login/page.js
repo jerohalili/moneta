@@ -3,7 +3,7 @@ import Link from 'next/link'
 import LoginForm from '@/components/LoginForm'
 
 export const metadata = {
-  title: 'Welcome — Moneta',
+  title: 'Moneta',
 }
 
 // /login is the only public route (AuthGate sends signed-in users home).

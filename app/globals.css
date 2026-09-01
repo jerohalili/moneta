@@ -660,6 +660,7 @@ button:focus-visible,
   padding: 6px 12px;
   cursor: pointer;
   line-height: 1;
+  min-width: 12ch;
 }
 
 .theme-toggle:hover {
@@ -672,8 +673,9 @@ button:focus-visible,
   outline-offset: 2px;
 }
 
-.theme-toggle-icon {
-  font-size: 13px;
+.theme-toggle-text {
+  flex: 1;
+  text-align: center;
 }
 
 /* ---------- Cards & shared primitives ---------- */

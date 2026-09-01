@@ -29,7 +29,9 @@ export default function AuthGate({ children }) {
 
   // While the session resolves, or while redirecting, show a quiet splash
   // instead of flashing app content for logged-out eyes.
-  if (pending || (!hasUser && !isPublic)) {
+  // Also show when a logged-in user hits /login (hasUser && isPublic) so
+  // they don't see the login form flash before being redirected home.
+  if (pending || (!hasUser && !isPublic) || (hasUser && isPublic)) {
     return (
       <div className="auth-splash" role="status">
         <span className="auth-splash-mark">Moneta</span>
