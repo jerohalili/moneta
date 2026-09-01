@@ -93,7 +93,6 @@ export default function LoginForm() {
         console.error('[guest sign-in]', result.error)
         setError(authErrorMessage(result))
       } else {
-        router.refresh()
         done()
       }
     } catch (e) {
