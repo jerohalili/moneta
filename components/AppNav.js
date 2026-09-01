@@ -14,6 +14,14 @@ const LINKS = [
 export default function AppNav() {
   const pathname = usePathname()
 
+  if (pathname === '/login') {
+    return (
+      <div className="login-top-bar">
+        <ThemeToggle />
+      </div>
+    )
+  }
+
   return (
     <div className="masthead-bar">
       <header className="masthead container">

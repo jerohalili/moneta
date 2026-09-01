@@ -13,7 +13,7 @@ import { authClient } from '@/lib/auth-client'
  * cascaded to it (profile, ledger, history, rate overrides).
  */
 export default function AccountButton() {
-  const { data: session, pending } = authClient.useSession()
+  const { data: session, isPending: pending } = authClient.useSession()
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(null) // 'signout' | 'delete' | null
   const menuRef = useRef(null)

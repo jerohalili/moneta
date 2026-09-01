@@ -145,7 +145,7 @@ button:focus-visible,
 
 .nav {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 24px;
   font-family: var(--font-mono);
   font-size: 13px;
@@ -348,6 +348,15 @@ button:focus-visible,
   text-decoration: underline;
 }
 
+/* ---------- Login page: floating theme toggle ---------- */
+
+.login-top-bar {
+  position: fixed;
+  top: 16px;
+  right: clamp(20px, 4vw, 56px);
+  z-index: 50;
+}
+
 /* ---------- Auth front door (/login + gate splash) ---------- */
 
 .auth-shell {
@@ -417,8 +426,10 @@ button:focus-visible,
   margin: 18px 0 14px;
 }
 
-.auth-splash {
-  min-height: 60vh;
+/* ---------- Auth loading ---------- */
+
+.auth-loading {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -426,7 +437,7 @@ button:focus-visible,
   gap: 8px;
 }
 
-.auth-splash-mark {
+.auth-loading-mark {
   font-family: var(--font-display);
   font-size: 30px;
   font-weight: 600;
@@ -436,7 +447,7 @@ button:focus-visible,
   color: transparent;
 }
 
-.auth-splash-note {
+.auth-loading-note {
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--ink-soft);

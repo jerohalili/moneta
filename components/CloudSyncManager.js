@@ -29,7 +29,7 @@ import { loadJSON } from '@/lib/localStore'
  * changes something, cleared only after a successful push.
  */
 export default function CloudSyncManager() {
-  const { data: session, pending } = authClient.useSession()
+  const { data: session, isPending: pending } = authClient.useSession()
   const userId = session?.user?.id ?? null
 
   const dirty = useRef({ profile: false, rates: false })
