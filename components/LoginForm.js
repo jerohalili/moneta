@@ -1,7 +1,7 @@
 'use client'
 
-import { startTransition, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { authClient, authErrorMessage } from '@/lib/auth-client'
 import { SYNC_EVENTS } from '@/lib/cloudSync'
 
@@ -13,7 +13,6 @@ import { SYNC_EVENTS } from '@/lib/cloudSync'
  * signs in on the same browser.
  */
 export default function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const [mode, setMode] = useState('signin') // 'signin' | 'signup'
   const [name, setName] = useState('')
@@ -24,23 +23,11 @@ export default function LoginForm() {
 
   function done() {
     const target = searchParams.get('next') || '/'
-    let attempts = 0
-    const maxAttempts = 20
-    const poll = () => {
-      const hasCookie = document.cookie
-        .split(';')
-        .some(c => c.trim().startsWith('moneta.'))
-      if (hasCookie || attempts >= maxAttempts) {
-        startTransition(() => {
-          router.push(target)
-          router.refresh()
-        })
-      } else {
-        attempts++
-        setTimeout(poll, 50)
-      }
-    }
-    setTimeout(poll, 50)
+    authClient.getSession().then(() => {
+      window.location.href = target
+    }).catch(() => {
+      window.location.href = target
+    })
   }
 
   async function handleGoogle() {
