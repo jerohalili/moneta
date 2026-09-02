@@ -23,17 +23,24 @@ export default function LoginForm() {
   const [busy, setBusy] = useState(null) // 'google' | 'email' | 'guest' | null
 
   function done() {
-    setTimeout(() => {
-      // router.push() isn't guaranteed to finish before router.refresh() runs
-      // (a known Next.js App Router race — vercel/next.js#54766), so refresh
-      // can fire against the pre-navigation route and the destination renders
-      // stale until a manual reload forces a fresh request. Wrapping both in
-      // one transition keeps them ordered.
-      startTransition(() => {
-        router.push(searchParams.get('next') || '/')
-        router.refresh()
-      })
-    }, 50)
+    const target = searchParams.get('next') || '/'
+    let attempts = 0
+    const maxAttempts = 20
+    const poll = () => {
+      const hasCookie = document.cookie
+        .split(';')
+        .some(c => c.trim().startsWith('moneta.'))
+      if (hasCookie || attempts >= maxAttempts) {
+        startTransition(() => {
+          router.push(target)
+          router.refresh()
+        })
+      } else {
+        attempts++
+        setTimeout(poll, 50)
+      }
+    }
+    setTimeout(poll, 50)
   }
 
   async function handleGoogle() {
