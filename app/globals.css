@@ -79,6 +79,7 @@ body {
 
 main.container {
   flex: 1 0 auto;
+  align-self: stretch;
 }
 
 main.container:has(.auth-shell) {
@@ -87,9 +88,11 @@ main.container:has(.auth-shell) {
 }
 
 .container {
+  width: 100%;
   max-width: 1360px;
   margin: 0 auto;
   padding: 0 clamp(20px, 4vw, 56px);
+  overflow-x: hidden;
 }
 
 /* ---------- Masthead / nav ---------- */
@@ -563,8 +566,8 @@ button:focus-visible,
 /* Each figure gets its own small boxed tile — bare label/value pairs read
    as loose text and leave the expanded row feeling empty. */
 .history-detail-item {
-  flex: 0 1 170px;
-  min-width: 140px;
+  flex: 0 1 220px;
+  min-width: 180px;
   background: rgba(var(--glass-rgb), 0.5);
   border: 1px solid var(--rule);
   border-radius: 8px;
@@ -935,7 +938,7 @@ label {
 
 .calc-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 16px;
 }
 
@@ -1502,6 +1505,7 @@ label {
 
 .walk-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 13px;
   margin-bottom: 10px;
@@ -1538,6 +1542,8 @@ label {
   font-family: var(--font-mono);
   font-weight: 500;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .walk-note {

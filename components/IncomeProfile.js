@@ -98,7 +98,15 @@ export default function IncomeProfile() {
       </section>
 
       {p.profileType === null && (
-        <p className="empty-copy">Pick a profile above and the advisor takes over from there.</p>
+        <>
+          <p className="empty-copy">Pick a profile above and the advisor takes over from there.</p>
+          <div className="stat-grid">
+            <StatTile label="Net Income (Pre-Tax)" value="—" />
+            <StatTile label="Estimated Tax Owed" value="—" />
+            <StatTile label="Effective Rate" value="—" />
+            <StatTile label="Est. Take-Home" value="—" />
+          </div>
+        </>
       )}
 
       {p.needsEmployeeFields && (
