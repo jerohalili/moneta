@@ -6,7 +6,7 @@ Moneta is a full-stack web app that answers one specific question millions of Fi
 
 Instead of another jargon-filled BIR explainer, Moneta asks you to build your **Income Profile** once — how you earn, what you make, what you spend on the business — and computes everything from it live: every tax you owe, when it's due, and a ranked, peso-valued plan of legal moves that lower the bill. Every recommendation cites the exact regulation it stands on (NIRC sections, TRAIN, CREATE, RA 9178, BIR Revenue Regulations) in plain language, not accountant-speak.
 
-**Core Philosophy:** *A decision engine, not a calculator dump.* Individual calculators are views onto one shared profile — the Dashboard advises rather than routes you between isolated forms.
+**Core Philosophy:** *A decision engine, not a calculator dump.* The Dashboard builds a single Income Profile that drives live recomputation and an advisor engine — while 21 standalone calculators under `/calculators` let you run focused, independent scenarios without touching your profile.
 
 The project also exists as a practice ground for real-world concerns: a rule engine where every suggestion must be defensible to a citation, a per-user rate-override layer that survives government rate changes without a redeploy, offline-first persistence with merge-based cloud sync, and a hydration-safe live-recompute architecture.
 
@@ -50,9 +50,9 @@ The project also exists as a practice ground for real-world concerns: a rule eng
 
 ## Features
 
-### Nine Taxpayer Profiles — One Source of Truth
+### Nine Taxpayer Profiles — One Source of Truth (Dashboard)
 
-The Income Profile isn't a form; it's the engine's input. Pick who you are and it orchestrates everything:
+The Income Profile on the Dashboard isn't a form; it's the engine's input. Pick who you are and it orchestrates everything — all stats, the advisor, and the walkthrough recalculate live from the same inputs:
 
 - **Employee** (single employer, substituted filing)
 - **Employee with multiple employers** — estimates the *underwithholding balance* you'll owe when filing BIR Form 1700, since each employer withholds against their own salary alone
@@ -63,13 +63,15 @@ The Income Profile isn't a form; it's the engine's input. Pick who you are and i
 - **Corporation / OPC** — CREATE Act RCIT (25% / 20% small-rate test) with MCIT from year 4
 - **Estate or trust** — graduated table per NIRC Sec. 60, with the 35%-on-accumulation warning
 
-This improves:
+This improves the Dashboard:
 - Accuracy — contributions, net pay, and 13th-month pay auto-compute from the same figure instead of being retyped per calculator
 - Coverage — the profiles most tools ignore (multi-employer, SMWE, OFW, estates) are first-class
 
-### 21 Live Calculators
+Note: the 21 standalone calculators under `/calculators` each manage their own independent inputs and do not read from this profile.
 
-Personal income (employee, freelancer, mixed, variable income, rental with the 8% election), payroll & benefits (net pay, 13th month, overtime, SSS/PhilHealth/Pag-IBIG contributions), business (VAT & percentage tax, corporate, EWT, BMBE savings, sole-prop-vs-corp), property & transfer (capital gains, documentary stamp, real property, estate, donor's), penalties (surcharges, closure penalty), and filing tools (filing calendar, form finder, 1701Q quarterly worksheet). Every calculator recomputes as you type — there is no "Calculate" button anywhere in the app.
+### 21 Standalone Calculators
+
+Personal income (employee, freelancer, mixed, variable income, rental with the 8% election), payroll & benefits (net pay, 13th month, overtime, SSS/PhilHealth/Pag-IBIG contributions), business (VAT & percentage tax, corporate, EWT, BMBE savings, sole-prop-vs-corp), property & transfer (capital gains, documentary stamp, real property, estate, donor's), penalties (surcharges, closure penalty), and filing tools (filing calendar, form finder, 1701Q quarterly worksheet). Each calculator has its own independent input fields — they do not read from the Dashboard's Income Profile, making them useful for quick "what-if" scenarios. Every calculator recomputes as you type — there is no "Calculate" button anywhere in the app.
 
 ### Rule-Based Optimization Advisor with Citations
 
@@ -119,7 +121,7 @@ The project was built engine-first, deliberately, because the riskiest unknowns 
 
 1. **Pure computation libraries first.** Every tax computation is a pure function in `lib/` with no React, validated with bracket-boundary and route-comparison smoke tests before any interface existed.
 2. **Calculator suite, staged.** Personal income → payroll → business → property/transfer → penalties → filing tools, each reusing the same primitives (graduated table, route comparison).
-3. **Shared Income Profile.** The Dashboard became the single input surface that orchestrates every computation automatically, replacing per-calculator retyping.
+3. **Shared Income Profile.** The Dashboard became the single input surface that orchestrates every computation automatically — tax results, advisor recommendations, and walkthroughs all recalculate live from the same inputs. The standalone calculators under `/calculators` were kept independent with their own state.
 4. **Advisor engine.** A static tips list was replaced by `buildAdvicePlan()` — ranked, peso-valued, citation-backed actions plus line-by-line walkthroughs generated from the user's actual figures.
 5. **Editable rates layer.** A registry-backed override store with a hydration contract (`RATES` starts identical to defaults so SSR and first paint agree; overrides apply after mount and notify subscribers), including documented gotchas like `Infinity` bracket bounds surviving JSON round-trips.
 6. **Auth + persistence.** Better Auth with Google, email, and guest accounts; Neon via Drizzle; a sync API under `/api/me/*`; and merge-based cloud sync so the app works fully offline.
