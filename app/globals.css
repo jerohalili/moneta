@@ -92,6 +92,11 @@ main.container:has(.auth-shell) {
   max-width: 1360px;
   margin: 0 auto;
   padding: 0 clamp(20px, 4vw, 56px);
+}
+
+main.container {
+  flex: 1 0 auto;
+  align-self: stretch;
   overflow-x: hidden;
 }
 
