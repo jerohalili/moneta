@@ -1,43 +1,3 @@
-<!-- TEMPLATE INSTRUCTIONS
-===========================================================================
-DESIGN SYSTEM TEMPLATE — for AI agents building a new project
-===========================================================================
-
-WHAT THIS IS:
-  A design system document in HTML. It renders as a visual reference
-  with colour swatches, type scale at real sizes, spacing bars, component
-  sketches, and token tables. Export to PDF via browser Print (Ctrl+P).
-
-HOW TO USE:
-  1. Open this file in your browser to see the template structure.
-  2. Search for [ and replace every placeholder with your project's values.
-  3. Search for "AI AGENT NOTE:" — each one explains what to fill in.
-  4. Add/remove swatches, components, and table rows as needed.
-  5. Keep the @media print CSS rules — they prevent content from splitting.
-  6. Export to PDF: Ctrl+P → Margins: None → Background graphics: on → Save.
-
-WHAT TO REPLACE (in order):
-  Step A: Styling approach pill + explanation
-  Step B: Colour token table (5 rows → your 3-5 core colours)
-  Step C: Type scale table (3 rows → your heading/body/small sizes)
-  Step D: Spacing token table (3 core rows → your base unit and scale)
-  Palette swatches: Replace hex values and labels
-  Category badges: Replace category names + colours (or remove if not needed)
-  Typography visual: Replace placeholder text with your actual type samples
-  Spacing/Radius: Adjust bar widths and radius values
-  Component sketches: Replace demo content with your actual components
-  Component table (Step E): Fill in your real components
-  Responsive plan (Step F): Fill in your real breakpoints
-  Accessibility checklist: Verify each item, update evidence text
-  Token quick reference: Replace CSS variable names + values
-
-DO NOT TOUCH:
-  - The @media print CSS rules (lines 9-15) — they work for any project
-  - The @page { size: letter; margin: 15mm; } rule
-  - The .page, .section, .break-inside classes — structural, not content
-  - The page break flow — it's set up for natural pagination
-===========================================================================
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -143,6 +103,16 @@ DO NOT TOUCH:
     .token-table th { text-align: left; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; padding: 8px 12px; border-bottom: 2px solid #e2e8f0; }
     .token-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 13px; color: #0f172a; }
     .token-table .mono { font-family: monospace; font-weight: 700; color: #14804A; }
+    
+    .hex-swatch {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      border: 1px solid rgba(0,0,0,0.1);
+      vertical-align: middle;
+      margin-right: 6px;
+    }
   </style>
 </head>
 <body>
@@ -151,7 +121,7 @@ DO NOT TOUCH:
 <!-- COVER PAGE                                                         -->
 <!-- ================================================================== -->
 <div class="page">
-  <div style="margin-bottom: 80px;">
+  <div style="margin-bottom: 40px;">
     <h1>Moneta</h1>
     <p style="font-size: 20px; font-weight: 700; color: #475569; margin-bottom: 8px;">Design System</p>
     <p class="subtitle">Philippine tax-smart companion &mdash; ledger-minimalist aesthetic with glass cards, green accents, and dark/light theming</p>
@@ -219,11 +189,11 @@ DO NOT TOUCH:
       <div>
         <table class="token-table" style="font-size: 13px;">
           <tr><th>Token</th><th>Role</th><th>Hex</th></tr>
-          <tr><td class="mono" style="font-size: 12px;">--ink</td><td style="color: #475569;">Body text, headings, primary content</td><td class="mono">#10251C</td></tr>
-          <tr><td class="mono" style="font-size: 12px;">--paper</td><td style="color: #475569;">Page background</td><td class="mono">#F5FAF6</td></tr>
-          <tr><td class="mono" style="font-size: 12px;">--accent</td><td style="color: #475569;">Links, buttons, active states, highlights</td><td class="mono">#14804A</td></tr>
-          <tr><td class="mono" style="font-size: 12px;">--ink-soft</td><td style="color: #475569;">Secondary text, captions, labels</td><td class="mono">#55695E</td></tr>
-          <tr><td class="mono" style="font-size: 12px;">--danger</td><td style="color: #475569;">Error states, destructive actions</td><td class="mono">#B4232C</td></tr>
+          <tr><td class="mono" style="font-size: 12px;">--ink</td><td style="color: #475569;">Body text, headings, primary content</td><td class="mono"><span class="hex-swatch" style="background: #10251C;"></span>#10251C</td></tr>
+          <tr><td class="mono" style="font-size: 12px;">--paper</td><td style="color: #475569;">Page background</td><td class="mono"><span class="hex-swatch" style="background: #F5FAF6;"></span>#F5FAF6</td></tr>
+          <tr><td class="mono" style="font-size: 12px;">--accent</td><td style="color: #475569;">Links, buttons, active states, highlights</td><td class="mono"><span class="hex-swatch" style="background: #14804A;"></span>#14804A</td></tr>
+          <tr><td class="mono" style="font-size: 12px;">--ink-soft</td><td style="color: #475569;">Secondary text, captions, labels</td><td class="mono"><span class="hex-swatch" style="background: #55695E;"></span>#55695E</td></tr>
+          <tr><td class="mono" style="font-size: 12px;">--danger</td><td style="color: #475569;">Error states, destructive actions</td><td class="mono"><span class="hex-swatch" style="background: #B4232C;"></span>#B4232C</td></tr>
         </table>
       </div>
       <div>
@@ -404,21 +374,21 @@ DO NOT TOUCH:
       <div class="theme-box dark">
         <div class="theme-label">Dark Theme</div>
         <table class="token-table">
-          <tr><td style="color:#94a3b8;">Background</td><td class="mono">#17191B</td></tr>
-          <tr><td style="color:#94a3b8;">Surface</td><td class="mono">#1E2124</td></tr>
-          <tr><td style="color:#94a3b8;">Text</td><td class="mono">#ECEFED</td></tr>
-          <tr><td style="color:#94a3b8;">Accent</td><td class="mono">#34D399</td></tr>
-          <tr><td style="color:#94a3b8;">Border</td><td class="mono">#33373A</td></tr>
+          <tr><td style="color:#94a3b8;">Background</td><td class="mono"><span class="hex-swatch" style="background: #17191B;"></span>#17191B</td></tr>
+          <tr><td style="color:#94a3b8;">Surface</td><td class="mono"><span class="hex-swatch" style="background: #1E2124;"></span>#1E2124</td></tr>
+          <tr><td style="color:#94a3b8;">Text</td><td class="mono"><span class="hex-swatch" style="background: #ECEFED;"></span>#ECEFED</td></tr>
+          <tr><td style="color:#94a3b8;">Accent</td><td class="mono"><span class="hex-swatch" style="background: #34D399;"></span>#34D399</td></tr>
+          <tr><td style="color:#94a3b8;">Border</td><td class="mono"><span class="hex-swatch" style="background: #33373A;"></span>#33373A</td></tr>
         </table>
       </div>
       <div class="theme-box light">
         <div class="theme-label">Light Theme</div>
         <table class="token-table">
-          <tr><td style="color:#475569;">Background</td><td class="mono" style="color:#059669;">#F5FAF6</td></tr>
-          <tr><td style="color:#475569;">Surface</td><td class="mono" style="color:#059669;">#FFFFFF</td></tr>
-          <tr><td style="color:#475569;">Text</td><td class="mono" style="color:#059669;">#10251C</td></tr>
-          <tr><td style="color:#475569;">Accent</td><td class="mono" style="color:#059669;">#14804A</td></tr>
-          <tr><td style="color:#475569;">Border</td><td class="mono" style="color:#059669;">#DBE6DD</td></tr>
+          <tr><td style="color:#475569;">Background</td><td class="mono" style="color:#059669;"><span class="hex-swatch" style="background: #F5FAF6;"></span>#F5FAF6</td></tr>
+          <tr><td style="color:#475569;">Surface</td><td class="mono" style="color:#059669;"><span class="hex-swatch" style="background: #FFFFFF;"></span>#FFFFFF</td></tr>
+          <tr><td style="color:#475569;">Text</td><td class="mono" style="color:#059669;"><span class="hex-swatch" style="background: #10251C;"></span>#10251C</td></tr>
+          <tr><td style="color:#475569;">Accent</td><td class="mono" style="color:#059669;"><span class="hex-swatch" style="background: #14804A;"></span>#14804A</td></tr>
+          <tr><td style="color:#475569;">Border</td><td class="mono" style="color:#059669;"><span class="hex-swatch" style="background: #DBE6DD;"></span>#DBE6DD</td></tr>
         </table>
       </div>
     </div>
@@ -937,17 +907,17 @@ DO NOT TOUCH:
       <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
         <h3 style="margin-bottom: 12px;">Colour Tokens (Light Theme)</h3>
         <table class="token-table" style="font-size: 12px;">
-          <tr><td class="mono" style="font-size: 11px;">--paper</td><td class="mono">#F5FAF6</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--paper-raised</td><td class="mono">#FFFFFF</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--ink</td><td class="mono">#10251C</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--ink-soft</td><td class="mono">#55695E</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--rule</td><td class="mono">#DBE6DD</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--accent</td><td class="mono">#14804A</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--accent-strong</td><td class="mono">#0C5C34</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--accent-soft</td><td class="mono">#E1F3E7</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--good</td><td class="mono">#14804A</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--danger</td><td class="mono">#B4232C</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--danger-soft</td><td class="mono">#FBE6E4</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--paper</td><td class="mono"><span class="hex-swatch" style="background: #F5FAF6;"></span>#F5FAF6</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--paper-raised</td><td class="mono"><span class="hex-swatch" style="background: #FFFFFF;"></span>#FFFFFF</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--ink</td><td class="mono"><span class="hex-swatch" style="background: #10251C;"></span>#10251C</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--ink-soft</td><td class="mono"><span class="hex-swatch" style="background: #55695E;"></span>#55695E</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--rule</td><td class="mono"><span class="hex-swatch" style="background: #DBE6DD;"></span>#DBE6DD</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--accent</td><td class="mono"><span class="hex-swatch" style="background: #14804A;"></span>#14804A</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--accent-strong</td><td class="mono"><span class="hex-swatch" style="background: #0C5C34;"></span>#0C5C34</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--accent-soft</td><td class="mono"><span class="hex-swatch" style="background: #E1F3E7;"></span>#E1F3E7</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--good</td><td class="mono"><span class="hex-swatch" style="background: #14804A;"></span>#14804A</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--danger</td><td class="mono"><span class="hex-swatch" style="background: #B4232C;"></span>#B4232C</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--danger-soft</td><td class="mono"><span class="hex-swatch" style="background: #FBE6E4;"></span>#FBE6E4</td></tr>
           <tr><td class="mono" style="font-size: 11px;">--glass-rgb</td><td class="mono">255, 255, 255</td></tr>
           <tr><td class="mono" style="font-size: 11px;">--glass-border</td><td class="mono">rgba(16,37,28,0.10)</td></tr>
           <tr><td class="mono" style="font-size: 11px;">--card-shadow</td><td class="mono">0 8px 28px rgba(16,37,28,0.07)</td></tr>
@@ -957,17 +927,17 @@ DO NOT TOUCH:
       <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
         <h3 style="margin-bottom: 12px;">Colour Tokens (Dark Theme)</h3>
         <table class="token-table" style="font-size: 12px;">
-          <tr><td class="mono" style="font-size: 11px;">--paper</td><td class="mono">#17191B</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--paper-raised</td><td class="mono">#1E2124</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--ink</td><td class="mono">#ECEFED</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--ink-soft</td><td class="mono">#9BA39E</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--rule</td><td class="mono">#33373A</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--accent</td><td class="mono">#34D399</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--accent-strong</td><td class="mono">#6EE7B4</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--accent-soft</td><td class="mono">#1D2E27</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--good</td><td class="mono">#34D399</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--danger</td><td class="mono">#F0605C</td></tr>
-          <tr><td class="mono" style="font-size: 11px;">--danger-soft</td><td class="mono">#2E1E1E</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--paper</td><td class="mono"><span class="hex-swatch" style="background: #17191B;"></span>#17191B</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--paper-raised</td><td class="mono"><span class="hex-swatch" style="background: #1E2124;"></span>#1E2124</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--ink</td><td class="mono"><span class="hex-swatch" style="background: #ECEFED;"></span>#ECEFED</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--ink-soft</td><td class="mono"><span class="hex-swatch" style="background: #9BA39E;"></span>#9BA39E</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--rule</td><td class="mono"><span class="hex-swatch" style="background: #33373A;"></span>#33373A</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--accent</td><td class="mono"><span class="hex-swatch" style="background: #34D399;"></span>#34D399</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--accent-strong</td><td class="mono"><span class="hex-swatch" style="background: #6EE7B4;"></span>#6EE7B4</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--accent-soft</td><td class="mono"><span class="hex-swatch" style="background: #1D2E27;"></span>#1D2E27</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--good</td><td class="mono"><span class="hex-swatch" style="background: #34D399;"></span>#34D399</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--danger</td><td class="mono"><span class="hex-swatch" style="background: #F0605C;"></span>#F0605C</td></tr>
+          <tr><td class="mono" style="font-size: 11px;">--danger-soft</td><td class="mono"><span class="hex-swatch" style="background: #2E1E1E;"></span>#2E1E1E</td></tr>
           <tr><td class="mono" style="font-size: 11px;">--glass-rgb</td><td class="mono">30, 33, 36</td></tr>
           <tr><td class="mono" style="font-size: 11px;">--glass-border</td><td class="mono">rgba(255,255,255,0.07)</td></tr>
           <tr><td class="mono" style="font-size: 11px;">--card-shadow</td><td class="mono">0 8px 28px rgba(0,0,0,0.35)</td></tr>
