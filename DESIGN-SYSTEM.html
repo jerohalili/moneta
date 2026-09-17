@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Moneta — Design System</title>
+  <title>Moneta Design System</title>
   <style>
     @page { size: letter; margin: 15mm; }
     @media print {
@@ -734,6 +734,16 @@
         <code style="font-size: 10px; color: #94a3b8;">0 4px 16px rgba(20, 128, 74, 0.35)</code>
       </div>
     </div>
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 16px;">
+      <h3 style="margin-bottom: 12px;">Focus Ring</h3>
+      <div style="display: flex; gap: 16px; align-items: center;">
+        <div style="padding: 10px 20px; border-radius: 10px; background: #ffffff; outline: 2px solid #14804A; outline-offset: 2px; font-size: 13px; font-weight: 700; color: #0f172a;">Focus Visible</div>
+        <code style="font-size: 12px; color: #94a3b8;">outline: 2px solid var(--accent); outline-offset: 2px</code>
+      </div>
+      <div style="margin-top: 8px; font-size: 12px; color: #94a3b8;">
+        Applied to: <code style="color:#14804A;">button:focus-visible</code>, <code style="color:#14804A;">input:focus-visible</code>, <code style="color:#14804A;">select:focus-visible</code>, <code style="color:#14804A;">a:focus-visible</code>
+      </div>
+    </div>
   </div>
   
   <div class="section">
@@ -946,25 +956,23 @@
     </div>
     
     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 24px;">
-      <h3 style="margin-bottom: 12px;">Typography &amp; Spacing Tokens</h3>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-        <div>
-          <table class="token-table" style="font-size: 12px;">
-            <tr><td class="mono" style="font-size: 11px;">--font-display</td><td class="mono">Fraunces (500, 600)</td></tr>
-            <tr><td class="mono" style="font-size: 11px;">--font-mono</td><td class="mono">IBM Plex Mono (400, 500)</td></tr>
-            <tr><td class="mono" style="font-size: 11px;">--font-body</td><td class="mono">Inter (400)</td></tr>
-          </table>
-        </div>
-        <div>
-          <table class="token-table" style="font-size: 12px;">
-            <tr><td class="mono" style="font-size: 11px;">Tight spacing</td><td class="mono">4px</td></tr>
-            <tr><td class="mono" style="font-size: 11px;">Compact spacing</td><td class="mono">8px</td></tr>
-            <tr><td class="mono" style="font-size: 11px;">Standard spacing</td><td class="mono">16px</td></tr>
-            <tr><td class="mono" style="font-size: 11px;">Section spacing</td><td class="mono">28px</td></tr>
-            <tr><td class="mono" style="font-size: 11px;">Screen edge padding</td><td class="mono">clamp(20px, 4vw, 56px)</td></tr>
-          </table>
-        </div>
-      </div>
+      <h3 style="margin-bottom: 12px;">Typography Tokens</h3>
+      <table class="token-table" style="font-size: 12px;">
+        <tr><td class="mono" style="font-size: 11px;">--font-display</td><td class="mono">Fraunces (500, 600)</td></tr>
+        <tr><td class="mono" style="font-size: 11px;">--font-mono</td><td class="mono">IBM Plex Mono (400, 500)</td></tr>
+        <tr><td class="mono" style="font-size: 11px;">--font-body</td><td class="mono">Inter (400)</td></tr>
+      </table>
+    </div>
+    
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 24px;">
+      <h3 style="margin-bottom: 12px;">Spacing Tokens</h3>
+      <table class="token-table" style="font-size: 12px;">
+        <tr><td class="mono" style="font-size: 11px;">Tight spacing</td><td class="mono">4px</td></tr>
+        <tr><td class="mono" style="font-size: 11px;">Compact spacing</td><td class="mono">8px</td></tr>
+        <tr><td class="mono" style="font-size: 11px;">Standard spacing</td><td class="mono">16px</td></tr>
+        <tr><td class="mono" style="font-size: 11px;">Section spacing</td><td class="mono">28px</td></tr>
+        <tr><td class="mono" style="font-size: 11px;">Screen edge padding</td><td class="mono">clamp(20px, 4vw, 56px)</td></tr>
+      </table>
     </div>
     
     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 24px;">
