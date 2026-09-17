@@ -7,6 +7,7 @@ import { RATES } from '@/lib/taxConfig'
 import StatTile from './StatTile'
 import SaveToHistoryButton from './SaveToHistoryButton'
 
+// why: non-VAT businesses pay 3% percentage tax on gross (NIRC Sec. 116, Form 2551Q).
 const MODES = [
   { id: 'percentage', label: 'Percentage Tax', description: 'Non-VAT-registered, 3% of gross.' },
   { id: 'vat', label: 'VAT', description: 'VAT-registered, output minus input.' },

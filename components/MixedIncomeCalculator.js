@@ -8,6 +8,7 @@ import StatTile from './StatTile'
 import ErrorFlags from './ErrorFlags'
 import SaveToHistoryButton from './SaveToHistoryButton'
 
+// why: mixed earners lose the ₱250k 8% exemption (RR 8-2018) — already used on compensation pay.
 export default function MixedIncomeCalculator() {
   const [compInput, setCompInput] = useState('')
   const [receiptsInput, setReceiptsInput] = useState('')

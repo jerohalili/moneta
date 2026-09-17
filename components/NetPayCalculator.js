@@ -6,6 +6,7 @@ import { formatPHP, formatPercent } from '@/lib/format'
 import StatTile from './StatTile'
 import SaveToHistoryButton from './SaveToHistoryButton'
 
+// why: monthly withholding annualizes pay through the graduated table (NIRC Sec. 24(A)).
 export default function NetPayCalculator() {
   const [monthlyInput, setMonthlyInput] = useState('')
   const monthly = Math.max(0, Number(monthlyInput) || 0)

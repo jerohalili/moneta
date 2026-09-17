@@ -7,6 +7,7 @@ import { RATES } from '@/lib/taxConfig'
 import StatTile from './StatTile'
 import SaveToHistoryButton from './SaveToHistoryButton'
 
+// why: CREATE (RA 11534) taxes corps at higher of RCIT vs 2% MCIT from year 4 (NIRC Sec. 27(E)).
 export default function CorporateTaxCalculator() {
   const [grossIncomeInput, setGrossIncomeInput] = useState('')
   const [netIncomeInput, setNetIncomeInput] = useState('')

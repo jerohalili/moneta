@@ -11,6 +11,7 @@ import TipsList from './TipsList'
 import ErrorFlags from './ErrorFlags'
 import SaveToHistoryButton from './SaveToHistoryButton'
 
+// why: 8% flat replaces graduated tax + percentage tax for eligible self-employed (NIRC Sec. 24(A)(2)(b)).
 export default function FreelancerWorkbench() {
   const wb = useFreelancerTax()
 

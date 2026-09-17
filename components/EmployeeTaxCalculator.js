@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { computeEmployeeTax } from '@/lib/employeeTax'
+import { birComputeEmployeeTax } from '@/lib/employeeTax'
+import { useBirNumericInput } from '@/hooks/useNumericInput'
 import { formatPHP, formatPercent } from '@/lib/format'
 import StatTile from './StatTile'
 import ErrorFlags from './ErrorFlags'
@@ -15,21 +16,20 @@ const MODES = [
 
 export default function EmployeeTaxCalculator() {
   const [mode, setMode] = useState('single')
-  const [grossInput, setGrossInput] = useState('')
-  const [contributionsInput, setContributionsInput] = useState('')
-  const [withheldInput, setWithheldInput] = useState('')
-  const [smwInput, setSmwInput] = useState('')
+  const [grossInput, setGrossInput, gross] = useBirNumericInput('')
+  const [contributionsInput, setContributionsInput, contributions] = useBirNumericInput('')
+  const [withheldInput, setWithheldInput] = useBirNumericInput('')
+  const [smwInput, setSmwInput] = useBirNumericInput('')
 
-  const gross = Math.max(0, Number(grossInput) || 0)
-  const contributions = Math.max(0, Number(contributionsInput) || 0)
   const withheld = mode === 'multi' && withheldInput.trim() !== '' ? Math.max(0, Number(withheldInput) || 0) : null
   const smw = mode === 'smwe' ? Math.max(0, Number(smwInput) || 0) : 0
   const hasIncome = gross > 0
 
+  // RA 9504: SMWE exempt — tax only the excess over regional minimum.
   const result = hasIncome
     ? mode === 'smwe'
-      ? computeEmployeeTax({ grossCompensation: Math.max(0, gross - smw), mandatoryContributions: contributions })
-      : computeEmployeeTax({ grossCompensation: gross, mandatoryContributions: contributions, withheldTax: withheld })
+      ? birComputeEmployeeTax({ grossCompensation: Math.max(0, gross - smw), mandatoryContributions: contributions })
+      : birComputeEmployeeTax({ grossCompensation: gross, mandatoryContributions: contributions, withheldTax: withheld })
     : null
 
   const effectiveRate = result && gross > 0 ? result.incomeTax / gross : null
@@ -46,7 +46,7 @@ export default function EmployeeTaxCalculator() {
     <>
       <section className="card glow-card">
         <h2>Your numbers</h2>
-        <p className="empty-copy" style={{ marginBottom: 18 }}>
+        <p className="empty-copy stack-md">
           Everything below recalculates as you type &mdash; there&apos;s no &ldquo;Calculate&rdquo; button to press.
         </p>
 

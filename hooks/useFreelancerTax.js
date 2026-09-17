@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { compareRoutes } from '@/lib/freelancerTax'
+import { birCompareRoutes as compareRoutes } from '@/lib/freelancerTax'
 import { getFreelancerTips } from '@/lib/advisor'
 import { EXPENSE_CATEGORIES } from '@/lib/expenseCategories'
 import useTaxRatesVersion from './useTaxRatesVersion'

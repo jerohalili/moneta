@@ -1,19 +1,4 @@
-/**
- * Philippine BIR tax figures — Tax Year 2026.
- *
- * Legal basis: TRAIN Law (RA 10963), effective brackets since Jan 1, 2023.
- * These have not changed for 2026. Percentage tax reverted to its
- * statutory 3% rate (NIRC Sec. 116) after the temporary 1% CREATE Act
- * relief expired June 30, 2023.
- *
- * IMPORTANT: If you're revisiting this file in a future tax year, verify
- * these figures against bir.gov.ph or a recent BIR Revenue Regulation
- * before trusting them — do not assume they're still current.
- *
- * Sources checked Aug 2026:
- * - https://quickbooks.intuit.com/ph/tax-brackets-and-tax-tables/
- * - https://www.taxumo.com/blog/bir-tax-table-2026/
- */
+// BIR 2026 figures (TRAIN RA 10963). Verify against bir.gov.ph yearly — do not assume current.
 
 // Graduated income tax brackets (annual taxable income, in PHP).
 // Structure: income above `over` up to `upTo` is taxed at `rate`,

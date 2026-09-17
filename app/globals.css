@@ -900,6 +900,11 @@ label {
   margin: 0;
 }
 
+/* Spacing helpers — prefer these over inline style={{ margin* }}. */
+.stack-sm { margin-bottom: 12px; }
+.stack-md { margin-bottom: 18px; }
+.stack-top { margin-top: 12px; }
+
 .status-pill {
   display: inline-block;
   font-family: var(--font-mono);
