@@ -125,7 +125,7 @@ moneta/
 
 ## 6. Screenshots
 
-> Captured from the live site (`moneta-lovat.vercel.app`) by the author on Sep 23, 2026.
+> Captured from the live site (`moneta-lovat.vercel.app`) on Sep 23, 2026.
 
 ![Dashboard](docs/screenshots/tax-snapshot.jpeg)
 *Tax Snapshot dashboard — Income Profile with live stats, bracket breakdown, action plan, and history.*
