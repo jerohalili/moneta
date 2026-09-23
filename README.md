@@ -125,16 +125,16 @@ moneta/
 
 ## 6. Screenshots
 
-> Captured from the live site by the author (placeholders — replace `docs/screenshots/*.png` with real captures before grading).
+> Captured from the live site (`moneta-lovat.vercel.app`) by the author on Sep 23, 2026.
 
-![Dashboard](docs/screenshots/01-dashboard.png)
-*Dashboard Income Profile with live stats, route comparison, and advisor.*
+![Dashboard](docs/screenshots/tax-snapshot.jpeg)
+*Tax Snapshot dashboard — Income Profile with live stats, bracket breakdown, action plan, and history.*
 
-![Calculator](docs/screenshots/02-calculator.png)
-*Standalone calculator — independent inputs, recomputes as you type.*
+![Calculators](docs/screenshots/calculators.jpeg)
+*Calculator gallery — every calculator recomputes live as you type.*
 
-![Settings](docs/screenshots/03-settings.png)
-*Editable rate registry with revert, reset-all, and JSON import/export.*
+![Sign in](docs/screenshots/signin.jpeg)
+*Sign in — Google, guest pass, or email; guests upgrade losslessly to Google/email.*
 
 ---
 
