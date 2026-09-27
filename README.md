@@ -6,6 +6,7 @@
 
 **Repo:** https://github.com/jerohalili/moneta
 **Live:** https://moneta-lovat.vercel.app/
+**Portfolio:** https://jerohalili.github.io/projects/moneta-tax-companion
 
 > ⚠️ Moneta provides general tax **information**, not personalized professional advice. Simple cases only; complex ones still belong with a CPA.
 
@@ -144,6 +145,7 @@ moneta/
 - `dev-only-insecure-secret` fallback in `lib/auth.js` is non-prod only by intent — documented, not a prod path.
 - Referenced `CONTINUE.md` (Google redirect-URI guide) is not in the repo; redirect URIs are listed in §2.3 above.
 - Next: align auth error copy, keep bracket-boundary smoke tests green after lib streamlines, verify build+lint clean.
+- Portfolio case study live at `jerohalili.github.io/projects/moneta-tax-companion` since Sep 25 — reuses these docs + screenshots for strangers/employers.
 
 ---
 

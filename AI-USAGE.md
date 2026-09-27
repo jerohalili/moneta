@@ -10,6 +10,7 @@ Started week 1, kept alongside work. Full 6 + 3 + who-wrote-what for finals badg
 - 2026-08-24, Claude — adjustable rates registry (`lib/taxConfig.js` + `SettingsEditor.js`). Kept registry + hydration contract, trimmed comments later. Commit `6c7d64c`.
 - 2026-08-25, Claude — Better Auth + Neon/Drizzle + `/api/me/*` sync APIs + merge policy. Kept shape, hardened auth over Week 3. Commit `65ff7df`.
 - 2026-09-19, Claude — README §§1–7 + SECURITY-CHECKLIST wording. Kept structure, evidence in own words. Commit (this change).
+- 2026-09-20–26 (Week 6) — no new AI prompts logged. Screenshots + caption cleanup + portfolio case-study assembly done by hand; no code changes.
 
 ## 2. Where the AI got it wrong
 
