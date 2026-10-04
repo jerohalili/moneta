@@ -9,7 +9,7 @@ Started week 1, kept alongside work. Full 6 + 3 + who-wrote-what for finals badg
 - 2026-08-23, Copilot — 15-calculator expansion (paired `lib/*.js` + wrappers). Kept primitives, split personal/payroll/business/property. Commits [`9718328`](https://github.com/jerohalili/moneta/commit/97183282911f6295826a6a38d6fb372b3a5c4f49), [`e912b2b`](https://github.com/jerohalili/moneta/commit/e912b2b034226916042a8e2f4eb225fd5a26be47), [`410bcc2`](https://github.com/jerohalili/moneta/commit/410bcc245b4c1e778acdef74bbb5dd994723b410).
 - 2026-08-24, Claude — adjustable rates registry (`lib/taxConfig.js` + `SettingsEditor.js`). Kept registry + hydration contract, trimmed comments later. Commit [`6c7d64c`](https://github.com/jerohalili/moneta/commit/6c7d64cccf1fd9f5c3050a7da00b6efa768b9680).
 - 2026-08-25, Claude — Better Auth + Neon/Drizzle + `/api/me/*` sync APIs + merge policy. Kept shape, hardened auth over Week 3. Commit [`65ff7df`](https://github.com/jerohalili/moneta/commit/65ff7dfc9ead83b6bf3f22ba7cecfd2eee9e9fd0).
-- 2026-09-19, Claude — README §§1–7 + SECURITY-CHECKLIST wording. Kept structure, evidence in own words. Commit [`a936bff`](https://github.com/jerohalili/moneta/commit/a936bff183398afb465a0d8f0814a879b56cab2f).
+- 2026-09-19, Claude — README 1–7 + SECURITY-CHECKLIST wording. Kept structure, evidence in own words. Commit [`a936bff`](https://github.com/jerohalili/moneta/commit/a936bff183398afb465a0d8f0814a879b56cab2f).
 - 2026-09-20–26 (Week 6) — no new AI prompts logged. Screenshots + caption cleanup + portfolio case-study assembly done by hand; no code changes.
 
 ## 2. Where the AI got it wrong
