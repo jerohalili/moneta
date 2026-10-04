@@ -171,3 +171,45 @@ Status: Feature-complete, polish / pre-final mode.
 ### What is left
 
 - Prod check left on moneta-lovat: guest-to-Google/email link keeping history and rates, plus a last responsive pass. Nothing blocking.
+
+
+---
+
+## Week 6 — September 20-26, 2026: documentation finalize + portfolio launch (3 commits, no code)
+
+### What changed this week
+
+#### Documentation finalize
+
+- `a936bff doc: add ai, security, and update readme` — new `AI-USAGE.md` (23 lines), new `SECURITY-CHECKLIST.md` (70 rows), README rewritten to §§1–7 (Income Profile engine, 9 taxpayer profiles, 21 calculators, editable rates, offline-first sync, endpoints, structure).
+- `7218198 doc: add screenshots` — 3 live captures in `docs/screenshots/`: `tax-snapshot.jpeg`, `calculators.jpeg`, `signin.jpeg`; README §6 wired to them.
+- `a9bf96d doc: clean up` — 1-line README caption cleanup; no code change.
+
+#### Portfolio launch
+
+- `jerohalili.github.io a93dacd` (Sep 25): replaced 4 placeholder projects with 7 real ones including `moneta-tax-companion.md` (~97 lines: 9-profile engine, advisor, 21 calculators, sync layer, endpoints, run steps) + cover `public/images/projects/moneta-tax.jpeg` + carousel/routing rework; `b30a046` smooth carousel animation, `43ebb66` scroll-refresh fix. Moneta is now discoverable from the portfolio, not just the repo + live URL.
+
+### Why
+
+- I spent the week on docs + portfolio instead of code because the engine was already feature-complete in Week 5; what was missing was a stranger-readable entry point. The portfolio case study reuses the README §§1–7 directly, so polishing one polished both.
+- No code changes was deliberate: touching the tax engine without a bracket-boundary reason would only add regression risk before the final.
+
+### What broke or what I got stuck on
+
+- Nothing broke — doc-only week. The only friction was condensing the README without losing the 9-profile / 21-calculator / sync details that make Moneta more than a calculator dump.
+
+### What is left
+
+- Prod check left on moneta-lovat: guest-to-Google/email link preserving history + rates, plus last responsive pass. Nothing blocking.
+
+---
+
+## Addendum — September 27, 2026: docs follow-up (1 commit, no code)
+
+### What changed
+
+- `aaff522 doc: screenshots and clean up` — docs-only follow-up: `AI-USAGE.md` +1 line (2026-09-20–26 Week 6 hand-note, no new AI prompts), `README.md` portfolio header + portfolio-live footer.
+
+### Why
+
+- This commit landed Sep 27, after the Sep 20–26 window, so it is logged here to keep the report honest.
