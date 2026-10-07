@@ -6,6 +6,7 @@ import { formatPHP } from '@/lib/format'
 import { RATES } from '@/lib/taxConfig'
 import StatTile from './StatTile'
 import SaveToHistoryButton from './SaveToHistoryButton'
+import { LiveRecalcNote } from './CalculatorShell'
 
 export default function BmbeCalculator() {
   const [assetsInput, setAssetsInput] = useState('')
@@ -23,9 +24,7 @@ export default function BmbeCalculator() {
     <>
       <section className="card glow-card">
         <h2>Your numbers</h2>
-        <p className="empty-copy" style={{ marginBottom: 18 }}>
-          Everything below recalculates as you type &mdash; there&apos;s no &ldquo;Calculate&rdquo; button to press.
-        </p>
+        <LiveRecalcNote />
         <div className="field">
           <label htmlFor="bmbe-assets">Total business assets, excluding land (₱)</label>
           <input id="bmbe-assets" type="number" inputMode="decimal" placeholder="e.g. 1200000" value={assetsInput} onChange={(e) => setAssetsInput(e.target.value)} />

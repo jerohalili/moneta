@@ -13,7 +13,12 @@ export async function GET() {
   const { session, unauthorized } = await getSessionOrUnauthorized()
   if (!session) return unauthorized()
   const userId = session.user.id
-  const db = getDb()
+  let db
+  try {
+    db = getDb()
+  } catch {
+    return NextResponse.json({ error: 'Service unavailable.' }, { status: 503 })
+  }
 
   const [profileRows, rateRows, historyRows] = await Promise.all([
     db.select().from(incomeProfiles).where(eq(incomeProfiles.userId, userId)).limit(1),
@@ -29,6 +34,9 @@ export async function GET() {
   return NextResponse.json({
     profile: profileRows[0] ?? null,
     rates: rateRows[0] ?? null,
-    history: historyRows.map((row) => row.payload),
+    history: historyRows.map(
+      /** @param {{ payload: unknown }} row */
+      (row) => row.payload,
+    ),
   })
 }

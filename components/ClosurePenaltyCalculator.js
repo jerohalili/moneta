@@ -5,6 +5,7 @@ import { computeClosurePenalty } from '@/lib/closurePenalty'
 import { formatPHP } from '@/lib/format'
 import StatTile from './StatTile'
 import SaveToHistoryButton from './SaveToHistoryButton'
+import { LiveRecalcNote } from './CalculatorShell'
 
 export default function ClosurePenaltyCalculator() {
   const [countInput, setCountInput] = useState('')
@@ -16,9 +17,7 @@ export default function ClosurePenaltyCalculator() {
     <>
       <section className="card glow-card">
         <h2>Your numbers</h2>
-        <p className="empty-copy" style={{ marginBottom: 18 }}>
-          Everything below recalculates as you type &mdash; there&apos;s no &ldquo;Calculate&rdquo; button to press.
-        </p>
+        <LiveRecalcNote />
         <div className="field">
           <label htmlFor="unfiled-count">Number of unfiled returns since you stopped operating</label>
           <input id="unfiled-count" type="number" inputMode="decimal" placeholder="e.g. 18" value={countInput} onChange={(e) => setCountInput(e.target.value)} />

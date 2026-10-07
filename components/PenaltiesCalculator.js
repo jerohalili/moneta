@@ -6,6 +6,7 @@ import { formatPHP } from '@/lib/format'
 import StatTile from './StatTile'
 import ErrorFlags from './ErrorFlags'
 import SaveToHistoryButton from './SaveToHistoryButton'
+import { LiveRecalcNote } from './CalculatorShell'
 
 export default function PenaltiesCalculator() {
   const [taxInput, setTaxInput] = useState('')
@@ -26,9 +27,7 @@ export default function PenaltiesCalculator() {
     <>
       <section className="card glow-card">
         <h2>Your numbers</h2>
-        <p className="empty-copy" style={{ marginBottom: 18 }}>
-          Everything below recalculates as you type &mdash; there&apos;s no &ldquo;Calculate&rdquo; button to press.
-        </p>
+        <LiveRecalcNote />
         <div className="field">
           <label htmlFor="basic-tax">Basic tax due (₱)</label>
           <input id="basic-tax" type="number" inputMode="decimal" placeholder="e.g. 50000" value={taxInput} onChange={(e) => setTaxInput(e.target.value)} />

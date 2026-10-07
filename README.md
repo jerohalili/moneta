@@ -143,7 +143,6 @@ moneta/
 
 - Prod check left on `moneta-lovat`: guest→Google/email link preserving history + rates, plus last responsive pass. Nothing blocking.
 - `dev-only-insecure-secret` fallback in `lib/auth.js` is non-prod only by intent — documented, not a prod path.
-- Referenced `CONTINUE.md` (Google redirect-URI guide) is not in the repo; redirect URIs are listed in §2.3 above.
 - Next: align auth error copy, keep bracket-boundary smoke tests green after lib streamlines, verify build+lint clean.
 - Portfolio case study live at `jerohalili.github.io/projects/moneta-tax-companion` since Sep 25 — reuses these docs + screenshots for strangers/employers.
 

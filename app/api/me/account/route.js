@@ -15,7 +15,12 @@ export async function DELETE() {
   const { session, unauthorized } = await getSessionOrUnauthorized()
   if (!session) return unauthorized()
 
-  const db = getDb()
+  let db
+  try {
+    db = getDb()
+  } catch {
+    return NextResponse.json({ error: 'Service unavailable.' }, { status: 503 })
+  }
   await db.delete(user).where(eq(user.id, session.user.id))
   return NextResponse.json({ ok: true })
 }

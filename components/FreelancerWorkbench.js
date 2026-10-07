@@ -10,6 +10,7 @@ import RouteComparison from './RouteComparison'
 import TipsList from './TipsList'
 import ErrorFlags from './ErrorFlags'
 import SaveToHistoryButton from './SaveToHistoryButton'
+import { LiveRecalcNote } from './CalculatorShell'
 
 // why: 8% flat replaces graduated tax + percentage tax for eligible self-employed (NIRC Sec. 24(A)(2)(b)).
 export default function FreelancerWorkbench() {
@@ -19,9 +20,7 @@ export default function FreelancerWorkbench() {
     <>
       <section className="card glow-card">
         <h2>Your numbers</h2>
-        <p className="empty-copy" style={{ marginBottom: 18 }}>
-          Everything below recalculates as you type &mdash; there&apos;s no &ldquo;Calculate&rdquo; button to press.
-        </p>
+        <LiveRecalcNote />
         <div className="field">
           <label htmlFor="gross-receipts">Gross receipts this year (₱)</label>
           <input

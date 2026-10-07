@@ -5,6 +5,7 @@ import { computeNetPay } from '@/lib/netPay'
 import { formatPHP, formatPercent } from '@/lib/format'
 import StatTile from './StatTile'
 import SaveToHistoryButton from './SaveToHistoryButton'
+import { LiveRecalcNote } from './CalculatorShell'
 
 // why: monthly withholding annualizes pay through the graduated table (NIRC Sec. 24(A)).
 export default function NetPayCalculator() {
@@ -18,9 +19,7 @@ export default function NetPayCalculator() {
     <>
       <section className="card glow-card">
         <h2>Your numbers</h2>
-        <p className="empty-copy" style={{ marginBottom: 18 }}>
-          Everything below recalculates as you type &mdash; there&apos;s no &ldquo;Calculate&rdquo; button to press.
-        </p>
+        <LiveRecalcNote />
         <div className="field">
           <label htmlFor="monthly-gross">Monthly gross compensation (₱)</label>
           <input

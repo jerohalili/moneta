@@ -17,7 +17,8 @@ const entrySchema = z.object({
 
 /** Upserts one history entry. Client-generated ids are the stable merge
  * key across devices, but a malicious client could send an id owned by
- * ANOTHER user — so ownership is checked before any write. */
+ * ANOTHER user — so ownership is checked before any write.
+ * @param {Request} req */
 export async function POST(req) {
   const { session, unauthorized } = await getSessionOrUnauthorized()
   if (!session) return unauthorized()
@@ -32,7 +33,12 @@ export async function POST(req) {
   }
 
   const userId = session.user.id
-  const db = getDb()
+  let db
+  try {
+    db = getDb()
+  } catch {
+    return NextResponse.json({ error: 'Service unavailable.' }, { status: 503 })
+  }
   const existing = await db.select({ userId: historyEntries.userId }).from(historyEntries).where(eq(historyEntries.id, entry.id)).limit(1)
   if (existing[0] && existing[0].userId !== userId) {
     return NextResponse.json({ error: 'Conflict.' }, { status: 409 })
@@ -50,6 +56,7 @@ export async function POST(req) {
   return NextResponse.json({ ok: true })
 }
 
+/** @param {Request} req */
 export async function DELETE(req) {
   const { session, unauthorized } = await getSessionOrUnauthorized()
   if (!session) return unauthorized()
@@ -58,7 +65,12 @@ export async function DELETE(req) {
   const id = url.searchParams.get('id')
   const all = url.searchParams.get('all')
 
-  const db = getDb()
+  let db
+  try {
+    db = getDb()
+  } catch {
+    return NextResponse.json({ error: 'Service unavailable.' }, { status: 503 })
+  }
   if (all === '1') {
     await db.delete(historyEntries).where(eq(historyEntries.userId, userId))
   } else if (id) {

@@ -13,10 +13,10 @@ import useTaxRatesVersion from './useTaxRatesVersion'
  * both the compact Dashboard view and the full /calculators/freelancer
  * page, so they never drift out of sync.
  *
- * IMPORTANT LIMITATION: this state lives only in the browser tab. There's
- * no account/database layer yet (see CONTINUE.md), so refreshing the page
- * or navigating away and back resets everything. That's a known, called-out
- * gap — not a bug to quietly work around.
+ * IMPORTANT LIMITATION: this state lives only in the browser tab. Snapshots
+ * persist through Save to History (see README §4), but refreshing the page
+ * or navigating away and back resets the draft inputs. That's a known,
+ * called-out gap — not a bug to quietly work around.
  */
 export function useFreelancerTax() {
   const [grossReceiptsInput, setGrossReceiptsInput] = useState('')

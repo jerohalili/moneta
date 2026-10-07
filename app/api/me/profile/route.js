@@ -12,7 +12,9 @@ const bodySchema = z.object({
 })
 
 const MAX_BYTES = 300_000
+const MAX_KEYS = 200
 
+/** @param {Request} req */
 export async function PUT(req) {
   const { session, unauthorized } = await getSessionOrUnauthorized()
   if (!session) return unauthorized()
@@ -21,11 +23,19 @@ export async function PUT(req) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid payload.' }, { status: 400 })
   }
+  if (Object.keys(parsed.data.data).length > MAX_KEYS) {
+    return NextResponse.json({ error: 'Profile snapshot too large.' }, { status: 413 })
+  }
   if (JSON.stringify(parsed.data.data).length > MAX_BYTES) {
     return NextResponse.json({ error: 'Profile snapshot too large.' }, { status: 413 })
   }
 
-  const db = getDb()
+  let db
+  try {
+    db = getDb()
+  } catch {
+    return NextResponse.json({ error: 'Service unavailable.' }, { status: 503 })
+  }
   const now = new Date()
   await db
     .insert(incomeProfiles)

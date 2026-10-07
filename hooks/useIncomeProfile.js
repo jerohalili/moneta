@@ -33,10 +33,9 @@ const STORAGE_KEY = 'income-profile'
  *
  * PERSISTENCE: this whole profile — type, income figures, the write-off
  * ledger, contribution overrides — is saved to localStorage and reloaded
- * on every visit. There's no account system yet (see CONTINUE.md), so
- * this is per-browser, not synced across devices, but it means the
- * profile survives a refresh instead of resetting every time, which it
- * did not do before this was added.
+ * on every visit (see README §4 — signed-in profiles additionally sync to
+ * the database via /api/me/profile), so the profile survives a refresh
+ * instead of resetting every time, which it did not do before this was added.
  *
  * AUTO-ORCHESTRATION: for Employee/Mixed profiles, this doesn't just
  * compute a tax number — it also runs the Net Pay and 13th Month Pay
@@ -325,7 +324,6 @@ export function useIncomeProfile() {
             vatRegistered,
             hasEmployeeIncome,
             hasBusinessIncome,
-            isMixed,
             isMultiEmployer,
             isSmwe,
             isOfw,
@@ -350,7 +348,7 @@ export function useIncomeProfile() {
     [
       hasAnyIncome, profileType, grossCompensation, grossReceipts, itemizedExpenses,
       mandatoryContributions, totalAssets, vatRegistered, hasEmployeeIncome,
-      hasBusinessIncome, isMixed, isMultiEmployer, isSmwe, isOfw, needsEstateTrustFields,
+      hasBusinessIncome, isMultiEmployer, isSmwe, isOfw, needsEstateTrustFields,
       smwAnnual, foreignIncome, employeeResult, estateTrustResult, businessComparison,
       thirteenthMonthResult, corporateResult, corpGrossSales, corpDeductions, corpYears,
       ratesVersion,

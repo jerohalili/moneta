@@ -11,6 +11,7 @@ Started week 1, kept alongside work. Full 6 + 3 + who-wrote-what for finals badg
 - 2026-08-25, Claude — Better Auth + Neon/Drizzle + `/api/me/*` sync APIs + merge policy. Kept shape, hardened auth over Week 3. Commit [`65ff7df`](https://github.com/jerohalili/moneta/commit/65ff7dfc9ead83b6bf3f22ba7cecfd2eee9e9fd0).
 - 2026-09-19, Claude — README 1–7 + SECURITY-CHECKLIST wording. Kept structure, evidence in own words. Commit [`a936bff`](https://github.com/jerohalili/moneta/commit/a936bff183398afb465a0d8f0814a879b56cab2f).
 - 2026-09-20–26 (Week 6) — no new AI prompts logged. Screenshots + caption cleanup + portfolio case-study assembly done by hand; no code changes.
+- 2026-10-07, humanize pass (OpenCode agent, AI-assisted + human review) — `node:test` oracle (`tests/tax-engine.test.mjs`, 23 cases incl. a real zero-income bracket bug fix in `lib/freelancerTax.js` + `lib/advisor.js`), `checkJs` on `lib/` + JSDoc + `@deprecated` aliases, Zod allowlist on `/api/me/rates` + 503 mapping on all `me/*` routes, `components/CalculatorShell.js` dedupe (15 copies → 1), stale `CONTINUE.md` refs fixed, `ci.yml` (lint+test+tsc+build). Features frozen; math changes limited to the zero-boundary fix.
 
 ## 2. Where the AI got it wrong
 

@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { compareRoutes } from '@/lib/freelancerTax'
 import { computeCorporateTax } from '@/lib/corporateTax'
 import { formatPHP } from '@/lib/format'
-import StatTile from './StatTile'
 import SaveToHistoryButton from './SaveToHistoryButton'
+import { LiveRecalcNote } from './CalculatorShell'
 
 export default function SoleVsCorpCalculator() {
   const [grossInput, setGrossInput] = useState('')
@@ -31,9 +31,7 @@ export default function SoleVsCorpCalculator() {
     <>
       <section className="card glow-card">
         <h2>Your numbers</h2>
-        <p className="empty-copy" style={{ marginBottom: 18 }}>
-          Everything below recalculates as you type &mdash; there&apos;s no &ldquo;Calculate&rdquo; button to press.
-        </p>
+        <LiveRecalcNote />
         <div className="field">
           <label htmlFor="svc-gross">Annual gross receipts/income (₱)</label>
           <input id="svc-gross" type="number" inputMode="decimal" placeholder="e.g. 4000000" value={grossInput} onChange={(e) => setGrossInput(e.target.value)} />

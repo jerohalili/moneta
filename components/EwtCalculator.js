@@ -5,6 +5,7 @@ import { computeEwt, EWT_CATEGORIES } from '@/lib/ewt'
 import { formatPHP } from '@/lib/format'
 import StatTile from './StatTile'
 import SaveToHistoryButton from './SaveToHistoryButton'
+import { LiveRecalcNote } from './CalculatorShell'
 
 const NEEDS_PAYEE_INCOME = ['professional-individual', 'professional-corporate']
 
@@ -24,9 +25,7 @@ export default function EwtCalculator() {
     <>
       <section className="card glow-card">
         <h2>Your numbers</h2>
-        <p className="empty-copy" style={{ marginBottom: 18 }}>
-          Everything below recalculates as you type &mdash; there&apos;s no &ldquo;Calculate&rdquo; button to press.
-        </p>
+        <LiveRecalcNote />
         <div className="field">
           <label htmlFor="ewt-category">Payment category</label>
           <select

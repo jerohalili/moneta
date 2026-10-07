@@ -7,6 +7,7 @@ import { formatPHP, formatPercent } from '@/lib/format'
 import StatTile from './StatTile'
 import ErrorFlags from './ErrorFlags'
 import SaveToHistoryButton from './SaveToHistoryButton'
+import { LiveRecalcNote } from './CalculatorShell'
 
 // why: mixed earners lose the ₱250k 8% exemption (RR 8-2018) — already used on compensation pay.
 export default function MixedIncomeCalculator() {
@@ -39,11 +40,10 @@ export default function MixedIncomeCalculator() {
     <>
       <section className="card glow-card">
         <h2>Your numbers</h2>
-        <p className="empty-copy" style={{ marginBottom: 18 }}>
-          Everything below recalculates as you type &mdash; there&apos;s no &ldquo;Calculate&rdquo; button to press.
+        <LiveRecalcNote>
           Fill in both sections: this calculator is for someone with compensation income AND business/professional
           income in the same year.
-        </p>
+        </LiveRecalcNote>
         <div className="field">
           <label htmlFor="mixed-comp">Annual gross compensation (₱)</label>
           <input id="mixed-comp" type="number" inputMode="decimal" placeholder="e.g. 400000" value={compInput} onChange={(e) => setCompInput(e.target.value)} />

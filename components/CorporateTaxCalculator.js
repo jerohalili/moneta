@@ -6,6 +6,7 @@ import { formatPHP } from '@/lib/format'
 import { RATES } from '@/lib/taxConfig'
 import StatTile from './StatTile'
 import SaveToHistoryButton from './SaveToHistoryButton'
+import { LiveRecalcNote } from './CalculatorShell'
 
 // why: CREATE (RA 11534) taxes corps at higher of RCIT vs 2% MCIT from year 4 (NIRC Sec. 27(E)).
 export default function CorporateTaxCalculator() {
@@ -26,9 +27,7 @@ export default function CorporateTaxCalculator() {
     <>
       <section className="card glow-card">
         <h2>Your numbers</h2>
-        <p className="empty-copy" style={{ marginBottom: 18 }}>
-          Everything below recalculates as you type &mdash; there&apos;s no &ldquo;Calculate&rdquo; button to press.
-        </p>
+        <LiveRecalcNote />
         <div className="field">
           <label htmlFor="corp-gross">Gross income (₱)</label>
           <input id="corp-gross" type="number" inputMode="decimal" placeholder="e.g. 8000000" value={grossIncomeInput} onChange={(e) => setGrossIncomeInput(e.target.value)} />

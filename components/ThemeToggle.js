@@ -23,7 +23,7 @@ export default function ThemeToggle() {
     document.documentElement.setAttribute('data-theme', next)
     try {
       localStorage.setItem('moneta-theme', next)
-    } catch (e) {
+    } catch {
       // Private-browsing / storage-disabled: theme just won't persist across visits.
     }
     setTheme(next)
